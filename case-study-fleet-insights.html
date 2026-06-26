@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fleet Insights 2.0 — Alyona Flak</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:wght@300;400;500&family=Google+Sans+Flex:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* ───────── Monochrome theme tokens — DARK (matches Home / About) ───────── */
+      --ink-rgb: 240, 240, 240;
+      --ink: rgb(var(--ink-rgb));
+      --accent-rgb: 245, 245, 245;
+      --accent: rgb(var(--accent-rgb));
+      --accent-hover: #ffffff;
+      --on-accent: #1a1a1a;
+
+      --bg-from: #1a1a1a;
+      --bg-to: #141414;
+      --surface: rgba(255,255,255,0.05);
+      --surface-solid: #252525;
+      --surface-strong: rgba(255,255,255,0.10);
+      --glass-border: rgba(255,255,255,0.12);
+      --shadow: rgba(0,0,0,0.55);
+
+      --purple: var(--accent);
+      --purple-deep: var(--accent);
+
+      --max-w: 1180px;
+      --gutter: 24px;
+      --col-gap: 100px;
+      --side-left: 84px;
+      --side-w: 360px;
+
+      --nav-bar-h: 52px;
+      --case-card-h: clamp(400px, 60vh, calc(92vh - 32px - 2 * var(--nav-bar-h) - 2 * var(--gutter)));
+      --ease-fast: cubic-bezier(.62,.61,.02,1);
+    }
+
+    html { scroll-behavior: smooth; color-scheme: dark; scrollbar-width: none; -ms-overflow-style: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(160deg, var(--bg-from) 0%, var(--bg-to) 100%) fixed;
+      font-family: 'Google Sans Flex', 'Helvetica Neue', sans-serif;
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s cubic-bezier(0.2,0.7,0.2,1),
+                  transform 0.7s cubic-bezier(0.2,0.7,0.2,1);
+      will-change: opacity, transform;
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal[data-reveal-delay="1"].in { transition-delay: 0.06s; }
+    .reveal[data-reveal-delay="2"].in { transition-delay: 0.12s; }
+    .reveal[data-reveal-delay="3"].in { transition-delay: 0.18s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ───────── Back-to-home link — lives at the top of the left column ───────── */
+    .cs-back {
+      display: inline-flex; align-items: center; gap: 7px;
+      align-self: flex-start;
+      font-weight: 400; font-size: 15px; letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.6); text-decoration: none; cursor: pointer;
+      transition: color 0.2s cubic-bezier(.4,0,.2,1), gap 0.2s ease;
+    }
+    .cs-back svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .cs-back:hover { color: var(--ink); gap: 10px; }
+
+    /* ───────── LEFT: sticky side column — sits exactly where "Hello, if you are" lives on Home ───────── */
+    .cs-side {
+      position: fixed;
+      top: calc(6vh + 16px);
+      bottom: calc(6vh + 16px);
+      left: var(--side-left);
+      width: var(--side-w);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      z-index: 10;
+    }
+
+    /* Title — same size/weight as the "Hello, if you are" heading */
+    .cs-side-title {
+      font-weight: 500;
+      font-size: 34px;
+      letter-spacing: -0.03em;
+      line-height: 1.18;
+      color: var(--ink);
+      text-wrap: balance;
+    }
+
+    .cs-side-meta {
+      margin-top: auto;
+      font-family: 'Google Sans Code', 'Google Sans Flex', monospace;
+      font-size: 12.5px;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      color: rgba(var(--ink-rgb),0.5);
+    }
+
+    /* Description — same recipe as the bio text under the Home heading */
+    .cs-side-desc {
+      font-size: 17px;
+      font-weight: 300;
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.78);
+      text-wrap: pretty;
+    }
+
+    /* ───────── Side-nav timeline — same rail/node treatment as the About "Career Journey" ───────── */
+    .cs-toc {
+      position: relative;
+      margin-top: 4px;
+      padding-left: 30px;
+      display: flex;
+      flex-direction: column;
+    }
+    .cs-toc::before {
+      content: "";
+      position: absolute;
+      left: 4px; top: var(--toc-rail-top, 8px); bottom: var(--toc-rail-bottom, 8px);
+      width: 2px;
+      background: rgba(var(--ink-rgb),0.12);
+      border-radius: 2px;
+    }
+    .cs-toc-fill {
+      position: absolute;
+      left: 4px; top: 8px;
+      width: 2px; height: 0;
+      background: var(--accent);
+      border-radius: 2px;
+      pointer-events: none;
+      transition: height 0.12s linear, top 0.12s linear;
+    }
+    .cs-toc-link {
+      position: relative;
+      font-size: 17px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      color: rgba(var(--ink-rgb),0.45);
+      text-decoration: none;
+      padding: 9px 0;
+      transition: color 0.25s ease;
+    }
+    .cs-toc-link::before {
+      content: "";
+      position: absolute;
+      left: -30px; top: 50%;
+      transform: translateY(-50%);
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      box-sizing: border-box;
+      background: var(--bg-from);
+      border: 2px solid rgba(var(--ink-rgb),0.25);
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+    .cs-toc-link:hover { color: rgba(var(--ink-rgb),0.8); }
+    .cs-toc-link.tl-active { color: rgba(var(--ink-rgb),0.92); font-weight: 400; }
+    .cs-toc-link.tl-active::before {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ───────── RIGHT: content cropped into a fixed band that scrolls internally
+       (same treatment as the About page's content view) ───────── */
+    .cs-layout {
+      position: fixed;
+      top: calc(6vh + 16px);
+      bottom: calc(6vh + 16px);
+      left: calc(var(--side-left) + var(--side-w) + var(--col-gap));
+      right: var(--side-left);
+      max-width: 900px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .cs-layout::-webkit-scrollbar { display: none; }
+
+    .cs-content {
+      display: flex;
+      flex-direction: column;
+      gap: 64px;
+      max-width: 780px;
+      padding-bottom: 40px;
+    }
+
+    /* Cover image — placed over the text instead of a full-bleed hero banner */
+    .cs-cover {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      aspect-ratio: 16 / 9;
+    }
+    .cs-cover img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .cs-section-label {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-transform: none;
+      color: var(--ink);
+      opacity: 1;
+      margin-bottom: 20px;
+    }
+
+    .cs-h2 {
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 20px;
+      text-wrap: balance;
+    }
+
+    .cs-body {
+      font-size: 17px;
+      font-weight: 300;
+      line-height: 1.6;
+      letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.75);
+      text-wrap: pretty;
+    }
+    .cs-body + .cs-body { margin-top: 16px; }
+    .cs-body strong { font-weight: 500; color: rgba(var(--ink-rgb),0.92); }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .tag {
+      font-size: 12px; font-weight: 400; letter-spacing: -0.005em;
+      color: var(--accent);
+      background: rgba(var(--accent-rgb),0.12);
+      padding: 4px 12px; border-radius: 100px;
+    }
+
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
+    .stat-card {
+      background: linear-gradient(var(--surface), var(--surface)), var(--bg-from);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 22px 22px;    }
+    .stat-num {
+      font-size: 32px; font-weight: 500; letter-spacing: -0.04em;
+      color: var(--ink); line-height: 1; margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 13px; font-weight: 300; letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.55); line-height: 1.4;
+    }
+
+    .insight-list { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+    .insight-item {
+      background: linear-gradient(var(--surface), var(--surface)), var(--bg-from);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 17px; font-weight: 300; line-height: 1.5; letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.72);
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .insight-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; color: var(--accent); opacity: 0.8; }
+    .insight-item strong { font-weight: 500; color: rgba(var(--ink-rgb),0.9); display: block; margin-bottom: 3px; }
+
+    .process-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
+    .process-step {
+      background: linear-gradient(var(--surface), var(--surface)), var(--bg-from);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 22px 22px;    }
+    .process-num {
+      font-size: 10.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--accent); opacity: 0.55; margin-bottom: 8px;
+    }
+    .process-title {
+      font-size: 15px; font-weight: 500; letter-spacing: -0.015em;
+      color: rgba(var(--ink-rgb),0.92); margin-bottom: 8px;
+    }
+    .process-desc {
+      font-size: 13.5px; font-weight: 300; line-height: 1.5; letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.58);
+    }
+
+    .cs-img-block {
+      margin-top: 28px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--glass-border);
+    }
+    .cs-img-block img { width: 100%; height: 300px; object-fit: cover; display: block; }
+    .cs-img-caption {
+      padding: 12px 16px;
+      font-size: 12px; font-weight: 300; letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.45);
+      border-top: 1px solid var(--glass-border);
+    }
+
+    /* ───────── Case-study screenshots (full image, no crop) ───────── */
+    .cs-shot {
+      margin: 28px 0;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+    }
+    .cs-shot img { width: 100%; height: auto; display: block; }
+
+    .cs-h3 {
+      font-size: 19px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      color: var(--ink);
+      margin-top: 36px;
+      margin-bottom: 12px;
+    }
+    .cs-h3:first-of-type { margin-top: 0; }
+
+    /* ───────── Before / after slider ───────── */
+    .ba-slider {
+      position: relative;
+      margin: 28px 0;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      background: var(--surface);
+      user-select: none;
+      touch-action: none;
+    }
+    .ba-slider-before, .ba-slider-after {
+      position: absolute;
+      inset: 0;
+    }
+    .ba-slider-before img, .ba-slider-after img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+    .ba-slider-after {
+      clip-path: inset(0 50% 0 0);
+    }
+    .ba-slider-line {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%;
+      width: 1.5px;
+      margin-left: -0.75px;
+      background: rgba(190,190,190,0.85);
+      pointer-events: none;
+    }
+    .ba-slider-handle {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 40px; height: 40px;
+      margin-left: -20px; margin-top: -20px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      gap: 1px;
+      pointer-events: none;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.25);
+    }
+    .ba-slider-handle svg { width: 9px; height: 9px; color: rgba(40,40,40,0.8); }
+    .ba-slider-tag {
+      position: absolute;
+      top: 14px;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase;
+      color: #fff;
+      background: rgba(0,0,0,0.45);
+      padding: 5px 11px;
+      border-radius: 100px;
+      pointer-events: none;
+    }
+    .ba-slider-tag-before { left: 14px; }
+    .ba-slider-tag-after { right: 14px; }
+    .ba-slider-input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: ew-resize;
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+    }
+
+    .cs-callout {
+      margin-top: 24px;
+      padding: 18px 22px;
+      background: rgba(var(--accent-rgb),0.05);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+    }
+    .cs-callout p {
+      font-size: 15px; font-weight: 300; line-height: 1.55; letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.78);
+    }
+    .cs-callout p strong { font-weight: 500; color: rgba(var(--ink-rgb),0.92); }
+
+    /* ───────── Bottom nav ───────── */
+    .cs-bottom-nav {
+      max-width: 780px;
+      margin-top: 80px;
+      padding-top: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      border-top: 1px solid var(--glass-border);
+    }
+    .cs-bottom-link {
+      display: flex; flex-direction: column; gap: 5px;
+      text-decoration: none; color: inherit; max-width: 320px;
+    }
+    .cs-bottom-link-label {
+      font-size: 11px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+      color: rgba(var(--ink-rgb),0.4);
+    }
+    .cs-bottom-link-title {
+      font-size: 18px; font-weight: 500; letter-spacing: -0.02em;
+      color: rgba(var(--ink-rgb),0.9); line-height: 1.2;
+      transition: color 0.2s ease;
+    }
+    .cs-bottom-link:hover .cs-bottom-link-title { color: #fff; }
+    .cs-bottom-link-arrow {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 300; color: rgba(var(--ink-rgb),0.55); margin-top: 3px;
+    }
+    .cs-bottom-link-arrow svg { width: 13px; height: 13px; }
+    .cs-bottom-link.next { text-align: right; align-items: flex-end; }
+
+    .cs-section[id] { scroll-margin-top: calc(6vh + 90px); }
+
+    /* ───────── RESPONSIVE ───────── */
+    @media (max-width: 1100px) {
+      .cs-side {
+        position: static;
+        width: auto;
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 110px var(--gutter) 0;
+      }
+      .cs-toc {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px 8px;
+        padding-left: 0;
+        margin-top: 8px;
+      }
+      .cs-toc::before, .cs-toc-fill { display: none; }
+      .cs-toc-link {
+        padding: 5px 13px;
+        background: var(--surface);
+        border: 1px solid var(--glass-border);
+        border-radius: 100px;
+      }
+      .cs-toc-link::before { display: none; }
+      .cs-toc-link.tl-active { background: var(--surface-strong); }
+      .cs-layout {
+        position: static;
+        top: auto; bottom: auto; left: auto; right: auto;
+        max-width: 780px;
+        margin: 0 auto;
+        overflow: visible;
+        padding: 36px var(--gutter) 80px;
+      }
+      .cs-content { margin: 0 auto; padding-bottom: 0; }
+    }
+
+    @media (max-width: 680px) {
+      .cs-side-title { font-size: 28px; }
+      .stat-row { grid-template-columns: 1fr; }
+      .process-grid { grid-template-columns: 1fr; }
+      .cs-bottom-nav { flex-direction: column; gap: 28px; }
+      .cs-bottom-link.next { align-items: flex-start; text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ───────── LEFT: sticky side column (back link + title + description + timeline nav) ───────── -->
+<aside class="cs-side">
+  <a class="cs-back" href="index.html#works">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M10 3L6 8l4 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to home
+  </a>
+  <h1 class="cs-side-title">Fleet Insights 2.0</h1>
+  <p class="cs-side-desc">Redesigning a complex maritime platform for fleet performance monitoring.</p>
+  <nav class="cs-toc" aria-label="Case study sections">
+    <span class="cs-toc-fill" aria-hidden="true"></span>
+    <a class="cs-toc-link" href="#overview">Overview</a>
+    <a class="cs-toc-link" href="#challenge">The challenge</a>
+    <a class="cs-toc-link" href="#approach">What I did</a>
+    <a class="cs-toc-link" href="#impact">Impact</a>
+  </nav>
+  <div class="cs-side-meta">Danelec · 2025 · Sole Product Designer</div>
+</aside>
+
+<!-- ───────── RIGHT: content cropped into a fixed, internally-scrolling band ───────── -->
+<main class="cs-layout" id="csView">
+  <div class="cs-content">
+
+    <!-- Cover image, placed over the text -->
+    <div class="cs-cover reveal">
+      <img src="assets/fleet insights case study images/Image 1.webp" alt="Fleet Insights platform" />
+    </div>
+
+    <section id="overview" class="cs-section reveal">
+      <div class="cs-section-label">Overview</div>
+      <p class="cs-body">
+        Fleet Insights is Danelec's platform for fleet operators monitoring fuel consumption, vessel performance, and operational efficiency across large fleets.
+      </p>
+      <p class="cs-body">
+        My role was to redesign the experience end-to-end: rethink the information architecture, improve navigation, bring related workflows closer together, adapt the new brand to a data-heavy interface, and introduce Danelec's first structured user research process for the product.
+      </p>
+    </section>
+
+    <section id="challenge" class="cs-section reveal">
+      <div class="cs-section-label">The challenge</div>
+      <p class="cs-body">
+        Fleet Insights is used by expert users: fleet managers, performance teams, and marine engineers. They do not need the product to be simplified in a consumer-product sense. They need fast access to precise data, clear hierarchy, and confidence that important information is not hidden.
+      </p>
+      <p class="cs-body">
+        The challenge was to make the platform easier to navigate without reducing the depth users relied on.
+      </p>
+      <p class="cs-body">
+        At the same time, the redesign had to work within several constraints:
+      </p>
+      <div class="insight-list">
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>Existing workflows still had to be supported.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>Diagnostics and Fouling Analysis were related, but users understood them as separate concepts.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>A new brand identity had to be applied without hurting readability in dense tables and charts.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>There was no existing research process, so validation had to be introduced while the redesign was already moving.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="approach" class="cs-section reveal">
+      <div class="cs-section-label">What I did</div>
+
+      <h3 class="cs-h3">Introduced structured user research</h3>
+      <p class="cs-body">
+        Before this project, Fleet Insights did not have a formal research process. I ran structured interviews with fleet managers to validate navigation assumptions and uncover workflow patterns that were not documented internally.
+      </p>
+      <p class="cs-body">
+        This helped move stakeholder discussions away from personal opinions and toward evidence from users.
+      </p>
+      <div class="cs-shot reveal">
+        <img src="assets/fleet insights case study images/Image 2.avif" alt="Fleet Insights research" />
+      </div>
+
+      <h3 class="cs-h3">Rebuilt navigation around user tasks</h3>
+      <p class="cs-body">
+        I mapped the main jobs users came to Fleet Insights to do: monitor fleet health, investigate vessel issues, and track performance problems.
+      </p>
+      <p class="cs-body">
+        The goal was not to remove functionality, but to reduce the number of decisions users had to make before reaching relevant data.
+      </p>
+      <div class="ba-slider reveal">
+        <div class="ba-slider-before"><img src="assets/fleet insights case study images/Image 3 - Before.jpg" alt="Navigation before redesign" /></div>
+        <div class="ba-slider-after"><img src="assets/fleet insights case study images/Image 3 - after.jpg" alt="Navigation after redesign" /></div>
+        <div class="ba-slider-line"></div>
+        <div class="ba-slider-handle">
+          <svg style="transform:rotate(90deg)" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg style="transform:rotate(-90deg)" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <span class="ba-slider-tag ba-slider-tag-before">Before</span>
+        <span class="ba-slider-tag ba-slider-tag-after">After</span>
+        <input type="range" class="ba-slider-input" min="0" max="100" value="50" aria-label="Drag to compare navigation before and after" />
+      </div>
+
+      <h3 class="cs-h3">Unified related workflows</h3>
+      <p class="cs-body">
+        Diagnostics and Fouling Analysis were previously separate modules, even though users often moved between them when investigating vessel performance.
+      </p>
+      <p class="cs-body">
+        I proposed a unified experience where both types of analysis could be accessed from one place, while preserving the terminology users already understood. This was an important trade-off: fully flattening the modules would have looked cleaner, but it risked making the product harder to understand for existing expert users.
+      </p>
+      <div class="ba-slider reveal">
+        <div class="ba-slider-before"><img src="assets/fleet insights case study images/Image 4 Before.jpg" alt="Diagnostics and Fouling Analysis before unification" /></div>
+        <div class="ba-slider-after"><img src="assets/fleet insights case study images/Image 4 After.jpg" alt="Diagnostics and Fouling Analysis after unification" /></div>
+        <div class="ba-slider-line"></div>
+        <div class="ba-slider-handle">
+          <svg style="transform:rotate(90deg)" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg style="transform:rotate(-90deg)" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <span class="ba-slider-tag ba-slider-tag-before">Before</span>
+        <span class="ba-slider-tag ba-slider-tag-after">After</span>
+        <input type="range" class="ba-slider-input" min="0" max="100" value="50" aria-label="Drag to compare workflows before and after" />
+      </div>
+
+      <h3 class="cs-h3">Adapted the rebrand for a data-heavy interface</h3>
+      <p class="cs-body">
+        The new visual identity had already been defined at brand level. My work was to translate it into a usable product interface.
+      </p>
+      <div class="cs-shot reveal">
+        <img src="assets/fleet insights case study images/Image 5.webp" alt="Rebrand applied to the product interface" />
+      </div>
+      <p class="cs-body">
+        I reviewed colors, typography, contrast, tables, charts, and dense layouts through a product lens. Where brand choices created readability issues, I adjusted the UI application while keeping the overall identity consistent.
+      </p>
+      <div class="cs-shot reveal">
+        <img src="assets/fleet insights case study images/Image 6.webp" alt="Brand adjustments for readability" />
+      </div>
+    </section>
+
+    <section id="impact" class="cs-section reveal">
+      <div class="cs-section-label">Impact</div>
+      <p class="cs-body">
+        The redesign made key workflows faster and easier to access:
+      </p>
+      <div class="insight-list">
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>Navigation to key areas became 30% faster.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>Users could reach key insights in under 1 minute, compared with previous journeys that could take 3–5 minutes.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>Danelec introduced its first structured research process for Fleet Insights.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>The new brand was applied across the product without compromising readability.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>Adoption risk was reduced through training sessions and walkthrough videos.</div>
+        </div>
+      </div>
+      <div class="cs-shot reveal">
+        <img src="assets/fleet insights case study images/Image 7.webp" alt="Fleet Insights training and walkthrough materials" />
+      </div>
+    </section>
+
+    <!-- Bottom nav -->
+    <div class="cs-bottom-nav">
+      <a class="cs-bottom-link" href="index.html#works">
+        <span class="cs-bottom-link-label">Back to</span>
+        <span class="cs-bottom-link-title">All work</span>
+        <span class="cs-bottom-link-arrow">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M10 3L6 8l4 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          View all case studies
+        </span>
+      </a>
+      <a class="cs-bottom-link next" href="case-study-atobi-actions.html">
+        <span class="cs-bottom-link-label">Next case study</span>
+        <span class="cs-bottom-link-title">Atobi Actions</span>
+        <span class="cs-bottom-link-arrow">
+          Redesigning mobile training for retail
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </a>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  /* ───── Reveal-on-scroll ───── */
+  const reveals = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => revealObserver.observe(el));
+
+  /* ───── Side-nav timeline — same rail-fill + node behaviour as the About "Career Journey".
+     The content is cropped into a fixed band (#csView) that scrolls internally on desktop,
+     or the whole page on narrow screens — handle both. ───── */
+  const tocLinks = [...document.querySelectorAll('.cs-toc-link')];
+  const tocFill  = document.querySelector('.cs-toc-fill');
+  const toc      = document.querySelector('.cs-toc');
+  const view     = document.getElementById('csView');
+  const sections = tocLinks.map(l => document.querySelector(l.getAttribute('href')));
+
+  function updateToc() {
+    if (!tocFill || !toc || !view) return;
+    const fixed = getComputedStyle(view).position === 'fixed';
+    const frame = view.getBoundingClientRect();
+    const readLineY = fixed ? frame.top + view.clientHeight * 0.4 : window.innerHeight * 0.4;
+
+    /* active = last section whose top has crossed the reading line */
+    let activeIdx = 0;
+    sections.forEach((s, i) => {
+      if (s && s.getBoundingClientRect().top <= readLineY) activeIdx = i;
+    });
+    const atBottom = fixed
+      ? view.scrollTop + view.clientHeight >= view.scrollHeight - 2
+      : window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    if (atBottom) activeIdx = tocLinks.length - 1;
+
+    tocLinks.forEach((l, i) => l.classList.toggle('tl-active', i <= activeIdx));
+
+    /* fill the rail from the first node's centre to the active node's centre */
+    const tocTop     = toc.getBoundingClientRect().top;
+    const firstRect  = tocLinks[0].getBoundingClientRect();
+    const lastRect   = tocLinks[tocLinks.length - 1].getBoundingClientRect();
+    const activeRect = tocLinks[activeIdx].getBoundingClientRect();
+    const startY     = (firstRect.top - tocTop) + firstRect.height / 2;
+    const lastY      = (lastRect.top - tocTop) + lastRect.height / 2;
+    const endY       = (activeRect.top - tocTop) + activeRect.height / 2;
+    tocFill.style.top    = startY + 'px';
+    tocFill.style.height = Math.max(0, endY - startY) + 'px';
+
+    /* anchor the static base track to the same first/last node centres so
+       it never sticks out past the first or last circle */
+    toc.style.setProperty('--toc-rail-top', startY + 'px');
+    toc.style.setProperty('--toc-rail-bottom', (toc.getBoundingClientRect().height - lastY) + 'px');
+  }
+
+  const rafToc = () => requestAnimationFrame(updateToc);
+  window.addEventListener('scroll', rafToc, { passive: true });
+  if (view) view.addEventListener('scroll', rafToc, { passive: true });
+  window.addEventListener('resize', rafToc);
+  updateToc();
+
+  /* ───── Before / after sliders ───── */
+  document.querySelectorAll('.ba-slider').forEach((slider) => {
+    const input = slider.querySelector('.ba-slider-input');
+    const after = slider.querySelector('.ba-slider-after');
+    const line = slider.querySelector('.ba-slider-line');
+    const handle = slider.querySelector('.ba-slider-handle');
+
+    const setValue = (val) => {
+      after.style.clipPath = `inset(0 ${100 - val}% 0 0)`;
+      line.style.left = val + '%';
+      handle.style.left = val + '%';
+    };
+
+    input.addEventListener('input', () => setValue(input.value));
+    setValue(input.value);
+  });
+</script>
+
+</body>
+</html>

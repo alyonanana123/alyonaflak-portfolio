@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Alyona Flak</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:wght@300;400;500&family=Google+Sans+Flex:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* ───────── Monochrome theme tokens — DARK (matches homepage) ───────── */
+      --ink-rgb: 240, 240, 240;
+      --ink: rgb(var(--ink-rgb));
+      --accent-rgb: 245, 245, 245;
+      --accent: rgb(var(--accent-rgb));
+      --accent-hover: #ffffff;
+      --on-accent: #1a1a1a;
+
+      --bg-from: #1a1a1a;
+      --bg-to: #141414;
+      --surface: rgba(255,255,255,0.05);
+      --surface-solid: #252525;               /* var(--surface) flattened over var(--bg-from) — opaque, so it doesn't double up when stacked on an already-translucent surface (e.g. avatar ring borders) */
+      --surface-strong: rgba(255,255,255,0.10);
+      --glass-border: rgba(255,255,255,0.12);
+      --shadow: rgba(0,0,0,0.55);
+
+      --purple: var(--accent);
+      --purple-deep: var(--accent);
+
+      --max-w: 1180px;
+      --gutter: 24px;
+      --col-gap: 100px;
+      --left-col: 1fr;
+      --right-col: 2.47fr;
+
+      --nav-bar-h: 52px;
+      --sticky-top: 32px;       /* used by .sc-canvas/.sc-card, ported from index.html for the Work view */
+      --case-card-h: clamp(400px, 60vh, calc(92vh - 32px - 2 * var(--nav-bar-h) - 2 * var(--gutter)));
+      --left-col-w: calc((min(100vw, var(--max-w)) - 2 * var(--gutter) - var(--col-gap)) * 0.2882);
+      --ease-fast: cubic-bezier(.62,.61,.02,1);
+    }
+
+    html { scroll-behavior: smooth; color-scheme: dark; scrollbar-width: none; -ms-overflow-style: none; }
+    html::-webkit-scrollbar { display: none; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(160deg, var(--bg-from) 0%, var(--bg-to) 100%) fixed;
+      font-family: 'Google Sans Flex', 'Helvetica Neue', sans-serif;
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    .grid-row {
+      display: grid;
+      grid-template-columns: var(--left-col) var(--right-col);
+      gap: var(--col-gap);
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s cubic-bezier(0.2,0.7,0.2,1),
+                  transform 0.7s cubic-bezier(0.2,0.7,0.2,1);
+      will-change: opacity, transform;
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal[data-reveal-delay="1"].in { transition-delay: 0.06s; }
+    .reveal[data-reveal-delay="2"].in { transition-delay: 0.12s; }
+    .reveal[data-reveal-delay="3"].in { transition-delay: 0.18s; }
+    .reveal[data-reveal-delay="4"].in { transition-delay: 0.24s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ───────── MAIN NAV — Work / About pill (same as homepage) ───────── */
+    .main-nav {
+      position: fixed; top: calc(6vh + 16px); left: 50%;
+      z-index: 30;
+      height: var(--nav-bar-h);
+      display: inline-flex; align-items: center; gap: 16px;
+      background: var(--surface);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      box-shadow: 0 1px 4px var(--shadow);
+      padding: 0 12px;
+      animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    .nav-links { display: flex; align-items: center; gap: 0; }
+    .nav-link {
+      position: relative;
+      font-weight: 400; font-size: 16px; letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.78); text-decoration: none; cursor: pointer;
+      padding: 9px 18px 10px; border-radius: 100px;
+      transition: color 0.2s cubic-bezier(.4,0,.2,1);
+    }
+    .nav-link::after {
+      content: ''; position: absolute; left: 14px; right: 14px; bottom: 4px; height: 1.5px;
+      background: var(--purple-deep); border-radius: 2px;
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+    }
+    .nav-link:hover { color: var(--purple-deep); }
+    .nav-link.active { color: var(--purple-deep); }
+
+    /* ───────── MAIN LAYOUT ───────── */
+    .layout {
+      width: 100%;
+      padding-top: 140px;
+      padding-bottom: 100px;
+      padding-left: calc(var(--gutter) + var(--left-col-w) + var(--col-gap));
+      padding-right: var(--gutter);
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    /* ───────── LEFT: Hello column (identical to Home, fixed in viewport) ───────── */
+    .hello-col {
+      position: fixed;
+      top: calc(6vh + 16px);
+      bottom: calc(6vh + 16px);
+      left: 84px;
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .hello-heading {
+      font-weight: 500;
+      font-size: 34px;
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+      color: var(--ink);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hello-icon {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .inline-chip-wrap {
+      position: relative;
+      display: inline-block;
+    }
+
+    .inline-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px 4px 14px;
+      border-radius: 100px;
+      border: 1px solid var(--glass-border);
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--purple-deep);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 34px;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .inline-chip:hover { background: var(--surface-strong); }
+    .inline-chip-wrap.open .inline-chip {
+      background: var(--surface-strong);
+      border-color: rgba(var(--accent-rgb),0.6);
+    }
+    .inline-chip:focus { outline: none; }
+    .inline-chip:focus-visible { box-shadow: 0 0 0 3px rgba(255,255,255,0.25); }
+
+    .inline-chip-caret {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      opacity: 0.7;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .inline-chip-wrap.open .inline-chip-caret { transform: rotate(180deg); }
+
+    .inline-chip-text {
+      display: inline-block;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .inline-chip-text.swap { opacity: 0; transform: translateY(-4px); }
+
+    .inline-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      min-width: 220px;
+      padding: 6px;
+      border-radius: 10px;
+      background: rgba(26,26,26,0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 12px 36px var(--shadow), 0 2px 8px var(--shadow);
+      opacity: 0;
+      transform: translateY(-4px) scale(0.97);
+      transform-origin: top left;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.4,0,0.2,1);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .inline-chip-wrap.open .inline-dropdown {
+      opacity: 1; transform: translateY(0) scale(1); pointer-events: auto;
+    }
+
+    .inline-dropdown button {
+      text-align: left;
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.75);
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .inline-dropdown button:hover { background: rgba(var(--accent-rgb),0.08); color: var(--ink); }
+    .inline-dropdown button.active { color: var(--purple-deep); background: rgba(var(--accent-rgb),0.1); font-weight: 500; }
+    .inline-dropdown button:focus { outline: none; }
+    .inline-dropdown button:focus-visible { box-shadow: 0 0 0 3px rgba(255,255,255,0.25); }
+    .inline-dropdown button .check {
+      width: 14px; height: 14px; opacity: 0;
+      transition: opacity 0.15s ease;
+      color: var(--purple-deep); flex-shrink: 0;
+    }
+    .inline-dropdown button.active .check { opacity: 1; }
+
+    .bio { position: relative; min-height: 140px; }
+
+    .bio-text {
+      position: absolute;
+      inset: 0;
+      font-size: 17px;
+      font-weight: 300;
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.78);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.32s ease, transform 0.32s ease;
+      pointer-events: none;
+      text-wrap: pretty;
+    }
+    .bio-text.active {
+      opacity: 1; transform: translateY(0); pointer-events: auto; position: relative;
+    }
+    .bio-text strong { font-weight: 500; color: rgba(var(--ink-rgb),0.95); }
+
+    .cta-row { display: flex; gap: 10px; align-items: center; }
+
+    /* ───── Experience list — pinned to bottom of sidebar ───── */
+    .experience-block { margin-top: auto; opacity: 0.8; }
+
+    .experience-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-family: 'Google Sans Code', 'Google Sans Flex', monospace;
+      font-size: 16px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      color: rgba(var(--ink-rgb),0.78);
+    }
+
+    .experience-link {
+      color: #fff;
+      text-decoration: underline;
+      text-decoration-color: rgba(255,255,255,0.5);
+      text-underline-offset: 4px;
+      text-decoration-thickness: 1px;
+      transition: color 0.2s ease, text-decoration-color 0.2s ease;
+    }
+    .experience-link:hover { color: var(--ink); text-decoration-color: rgba(255,255,255,0.5); }
+
+    /* ───────── BUTTONS ───────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-weight: 400;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      white-space: nowrap;
+      transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-primary { background-color: var(--accent); color: var(--on-accent); }
+    .btn-primary:hover { background-color: rgb(205, 205, 205); }
+    .btn-ghost { background-color: transparent; color: var(--ink); border: 1px solid rgba(var(--ink-rgb),0.18); }
+    .btn-ghost:hover { border-color: rgba(var(--accent-rgb),0.5); color: var(--purple-deep); }
+    .btn-ghost.copied { color: var(--accent); border-color: rgba(var(--accent-rgb),0.4); }
+
+    .btn-copy-icon-wrap { position: relative; width: 17px; height: 17px; flex-shrink: 0; }
+    .btn-copy-icon {
+      position: absolute; inset: 0; width: 17px; height: 17px;
+      transition: opacity 0.25s ease, transform 0.25s ease, filter 0.25s ease;
+    }
+    .btn-copy-icon-check { opacity: 0; transform: scale(0); filter: blur(4px); }
+    .btn-copy.copied .btn-copy-icon-copy { opacity: 0; transform: scale(0); filter: blur(4px); }
+    .btn-copy.copied .btn-copy-icon-check { opacity: 1; transform: scale(1); filter: blur(0px); }
+
+    /* ───── CV preview modal ───── */
+    .cv-modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .cv-modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .cv-modal {
+      width: min(900px, 90vw); height: 90vh;
+      display: flex; flex-direction: column;
+      background: var(--surface-strong);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      box-shadow: 0 24px 60px var(--shadow);
+      overflow: hidden;
+      transform: scale(0.97) translateY(8px);
+      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    .cv-modal-overlay.open .cv-modal { transform: scale(1) translateY(0); }
+    .cv-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--glass-border);
+      flex-shrink: 0;
+    }
+    .cv-modal-title { font-size: 15px; font-weight: 500; color: var(--ink); }
+    .cv-modal-actions { display: flex; align-items: center; gap: 8px; }
+    .cv-modal-download {
+      display: inline-flex; align-items: center;
+      padding: 7px 16px; border-radius: 6px;
+      background: var(--accent); color: var(--on-accent);
+      font-size: 14px; font-weight: 400; text-decoration: none;
+      transition: background 0.18s ease;
+    }
+    .cv-modal-download:hover { background: rgb(205, 205, 205); }
+    .cv-modal-close {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 6px;
+      border: none; background: transparent;
+      color: rgba(var(--ink-rgb),0.7);
+      font-size: 22px; line-height: 1; cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease;
+    }
+    .cv-modal-close:hover { background: var(--surface); color: var(--ink); }
+    .cv-modal-frame { flex: 1; width: 100%; border: none; background: #fff; }
+
+    /* ───────── RIGHT: About content ───────── */
+    .content-col {
+      display: flex;
+      flex-direction: column;
+      gap: 64px;
+      max-width: 640px;
+    }
+
+    /* Card treatment for each About section — same surface/border/shadow
+       recipe as .sc-project / .sc-testimonial on the homepage. */
+    .about-section {
+      background: linear-gradient(var(--surface), var(--surface)), var(--bg-from);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 36px 40px;
+      box-shadow: 0 3px 12px var(--shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    #aboutFirstSection { margin-top: 0; }
+
+    /* Clip the About content to the same vertical band as the Hello
+       column — top level with "Hello, if you are", bottom level with
+       "Copenhagen · LinkedIn" — and let it scroll internally within
+       that band instead of scrolling the whole page. */
+    #aboutView {
+      position: fixed;
+      top: calc(50vh - var(--case-card-h) / 2); /* same top edge as the resting case-study card */
+      bottom: calc(6vh + 16px);
+      left: 544px;
+      right: 84px;
+      max-width: 900px; /* matches .sc-card's case-study card width cap */
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    #aboutView::-webkit-scrollbar { display: none; }
+
+    .section-label {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.75;
+      margin-bottom: 14px;
+    }
+
+    .section-h2 {
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 20px;
+      text-wrap: balance;
+    }
+
+    .section-body {
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 1.6;
+      letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.75);
+      text-wrap: pretty;
+    }
+    .section-body + .section-body { margin-top: 16px; }
+    .section-body strong { font-weight: 500; color: rgba(var(--ink-rgb),0.92); }
+
+    /* Experience timeline */
+    .exp-list { display: flex; flex-direction: column; gap: 0; margin-top: 4px; position: relative; padding-left: 30px; }
+    /* Timeline rail — dim base track running the length of the list */
+    .exp-list::before {
+      content: "";
+      position: absolute;
+      left: 4px; top: var(--rail-top, 7px); bottom: var(--rail-bottom, 8px);
+      width: 2px;
+      background: rgba(var(--ink-rgb),0.12);
+      border-radius: 2px;
+    }
+    /* Scroll-progress fill — height driven by JS as the list scrolls */
+    .exp-rail-fill {
+      position: absolute;
+      left: 4px; top: var(--rail-top, 7px);
+      width: 2px; height: 0;
+      background: var(--accent);
+      border-radius: 2px;
+      pointer-events: none;
+      transition: height 0.12s linear;
+    }
+    .exp-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 24px;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(var(--ink-rgb),0.08);
+    }
+    .exp-item:first-child { padding-top: 0; }
+    .exp-item:last-child { border-bottom: none; }
+    /* Timeline node dot, centered on the rail */
+    .exp-item::before {
+      content: "";
+      position: absolute;
+      left: -30px; top: 22px;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      box-sizing: border-box;
+      background: var(--bg-from);
+      border: 2px solid rgba(var(--ink-rgb),0.25);
+      transition: background 0.25s ease, border-color 0.25s ease;
+      z-index: 1;
+    }
+    .exp-item:first-child::before { top: 2px; }
+    .exp-item.tl-active::before {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .exp-date {
+      font-size: 12px; font-weight: 400; letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.4); padding-top: 3px; line-height: 1.35;
+    }
+    .exp-role {
+      font-size: 16px; font-weight: 500; letter-spacing: -0.015em;
+      color: rgba(var(--ink-rgb),0.92); margin-bottom: 2px;
+    }
+    .exp-company {
+      font-size: 13.5px; font-weight: 300; letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.55); margin-bottom: 8px;
+    }
+    .exp-desc {
+      font-size: 14px; font-weight: 300; line-height: 1.5;
+      letter-spacing: -0.01em; color: rgba(var(--ink-rgb),0.65); text-wrap: pretty;
+    }
+    .exp-desc-list {
+      font-size: 14px; font-weight: 300; line-height: 1.5;
+      letter-spacing: -0.01em; color: rgba(var(--ink-rgb),0.65); text-wrap: pretty;
+      margin: 0; padding-left: 16px;
+    }
+    .exp-desc-list li { margin-bottom: 2px; }
+    .exp-desc-list li:last-child { margin-bottom: 0; }
+    .exp-logo {
+      height: 14px; width: auto; vertical-align: -2px;
+      margin-right: 6px; border-radius: 3px;
+    }
+    .exp-tag {
+      display: inline-block; font-size: 11px; font-weight: 400;
+      letter-spacing: -0.005em; color: var(--accent);
+      background: rgba(var(--accent-rgb),0.14);
+      padding: 2px 9px; border-radius: 100px; margin-left: 8px; vertical-align: 2px;
+    }
+
+    /* Beyond work */
+    .beyond-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 4px; }
+    .beyond-card {
+      display: flex; flex-direction: column; gap: 16px;
+      padding: 18px 18px 20px;
+      background: linear-gradient(var(--surface), var(--surface)), var(--bg-from);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .beyond-card-flag { display: flex; align-items: center; gap: 8px; }
+    .beyond-card-flag svg { width: 22px; height: auto; border-radius: 4px; flex-shrink: 0; display: block; }
+    .beyond-card-place {
+      font-size: 12.5px; font-weight: 400; letter-spacing: -0.005em;
+      color: rgba(var(--ink-rgb),0.55);
+    }
+    .beyond-card-text {
+      font-size: 16px; font-weight: 500; line-height: 1.35;
+      letter-spacing: -0.015em; color: rgba(var(--ink-rgb),0.92);
+      text-wrap: pretty;
+    }
+    @media (max-width: 720px) {
+      .beyond-cards { grid-template-columns: 1fr; }
+    }
+
+
+    /* ───────── STACKED CASE STUDIES (Work view) ─────────
+       Ported verbatim from index.html: this page never shows this
+       markup on its own, but the page router can swap "Work" content
+       in here, so it needs the matching styles to render correctly. */
+
+    .sc-scroll-space {
+      height: 3600vh;
+      position: relative;
+      pointer-events: none;
+    }
+
+    .sc-canvas {
+      position: fixed;
+      top: var(--sticky-top);
+      height: calc(100vh - var(--sticky-top));
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+
+    .sc-canvas.sc-canvas-hidden {
+      opacity: 0;
+      pointer-events: none !important;
+    }
+
+    .sc-card {
+      position: absolute;
+      top: calc(50vh - var(--sticky-top));
+      left: 50%;
+      width: 100%;
+      max-width: 900px;
+      height: var(--case-card-h);
+      border-radius: 12px;
+      overflow: hidden;
+      will-change: transform, opacity;
+      transform: translate(-50%, -50%) translateY(4vh) scale(0.95);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 700ms cubic-bezier(.62,.61,.02,1),
+                  opacity   700ms cubic-bezier(.62,.61,.02,1);
+    }
+
+    .sc-card.sc-active {
+      transform: translate(-50%, -50%);
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    .sc-card.sc-exiting {
+      transform: translate(-50%, -50%) translateY(-50vh) scale(0.88) rotate(6deg);
+      opacity: 0;
+      z-index: 15;
+      pointer-events: none;
+      transition: transform 700ms cubic-bezier(.62,.61,.02,1) 0ms,
+                  opacity   700ms cubic-bezier(.62,.61,.02,1) 120ms;
+    }
+
+    .sc-card.sc-exiting-back {
+      transform: translate(-50%, -50%) translateY(40vh) scale(0.88) rotate(-4deg);
+      opacity: 0;
+      z-index: 15;
+      pointer-events: none;
+      transition: transform 700ms cubic-bezier(.62,.61,.02,1) 0ms,
+                  opacity   700ms cubic-bezier(.62,.61,.02,1) 120ms;
+    }
+
+    .sc-card.sc-enter-top {
+      transform: translate(-50%, -50%) translateY(-5vh) scale(0.95);
+      opacity: 0;
+      pointer-events: none;
+      transition: none;
+    }
+
+    .sc-card.sc-next {
+      transform: translate(-50%, -50%) translateY(3vh) scale(0.95);
+      opacity: 0.55;
+      z-index: 8;
+      pointer-events: none;
+    }
+
+    .sc-card.sc-next2 {
+      transform: translate(-50%, -50%) translateY(6vh) scale(0.90);
+      opacity: 0.32;
+      z-index: 7;
+      pointer-events: none;
+    }
+
+    .sc-card.sc-next3 {
+      transform: translate(-50%, -50%) translateY(9vh) scale(0.85);
+      opacity: 0.16;
+      z-index: 6;
+      pointer-events: none;
+    }
+
+    .sc-project-hover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      font-size: 12.5px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--accent);
+      background: var(--bg-from);
+      padding: 10px 20px;
+      border-radius: 0;
+      opacity: 0;
+      transform: translate(10px, 10px);
+      transition: opacity 0.18s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .sc-project:hover .sc-project-hover { opacity: 1; }
+
+    .sc-project {
+      background: linear-gradient(var(--surface), var(--surface)), var(--bg-from);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 3px 12px var(--shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: grid;
+      grid-template-columns: 55fr 45fr;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .sc-project-image {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .sc-project-image img {
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 8px;
+      overflow: hidden;
+      display: block;
+    }
+
+    .sc-project-body {
+      padding: 40px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: transparent;
+    }
+
+    .sc-project-meta {
+      font-family: 'Google Sans Code', 'Google Sans Flex', monospace;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(var(--ink-rgb),0.45);
+      margin: 0;
+    }
+
+    .sc-project-title {
+      font-size: 34px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: rgba(var(--ink-rgb),0.92);
+      margin: 0;
+      text-wrap: balance;
+    }
+
+    .sc-project-sub {
+      font-size: 17px;
+      font-weight: 300;
+      line-height: 1.45;
+      color: rgba(var(--ink-rgb),0.6);
+      margin: 0;
+      text-wrap: pretty;
+    }
+
+    .sc-project-foot {
+      margin-top: auto;
+      padding-top: 8px;
+    }
+
+    .sc-project-cta {
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(var(--ink-rgb),0.45);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: -0.01em;
+      transition: color 0.2s ease;
+    }
+
+    .sc-project:hover .sc-project-cta { color: rgba(var(--ink-rgb),0.85); }
+
+    .sc-project-disabled:hover .sc-project-cta { color: rgba(var(--ink-rgb),0.45); }
+
+    .sc-testimonial {
+      background: linear-gradient(var(--surface), var(--surface)), var(--bg-from);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 3px 12px var(--shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 56px 72px;
+      text-align: center;
+    }
+
+    .sc-t-ref {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 20px;
+    }
+
+    .sc-t-quotemark {
+      font-size: 80px;
+      line-height: 0.5;
+      font-weight: 700;
+      color: rgba(var(--ink-rgb),0.14);
+      font-family: Georgia, 'Times New Roman', serif;
+      margin-bottom: 20px;
+      user-select: none;
+    }
+
+    .sc-t-quote {
+      font-size: 20px;
+      font-weight: 300;
+      line-height: 1.55;
+      letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.88);
+      max-width: 500px;
+      margin: 0 0 24px;
+      text-wrap: balance;
+    }
+
+    .sc-t-author {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(var(--ink-rgb),0.08);
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .sc-t-name {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.92);
+    }
+
+    .sc-t-role {
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      color: rgba(var(--ink-rgb),0.55);
+    }
+
+    .switcher {
+      position: fixed;
+      bottom: calc(6vh + 16px);
+      left: -9999px;
+      z-index: 50;
+      height: 46px;
+      display: flex; flex-direction: row; align-items: center; gap: 14px;
+      background: var(--surface);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      padding: 0 12px;
+      box-shadow: 0 1px 4px var(--shadow);
+      transition: opacity 0.6s ease;
+    }
+
+    .switcher.switcher-section-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .switcher-counter {
+      font-size: 11px; font-weight: 400; letter-spacing: -0.02em;
+      color: rgba(var(--ink-rgb),0.4); font-variant-numeric: tabular-nums;
+      writing-mode: horizontal-tb;
+    }
+
+    .switcher-logos { display: flex; flex-direction: row; align-items: center; }
+
+    /* overlapping circles — each subsequent logo tucks under the previous one */
+    .switcher-logos > .switcher-logo + .switcher-logo { margin-left: -5px; }
+
+    .switcher-logo {
+      width: 28px; height: 28px; border-radius: 50%; box-sizing: border-box;
+      border: 2px solid var(--surface-solid); padding: 0; cursor: pointer;
+      background: var(--surface-solid); position: relative;
+      transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* first logo sits frontmost; each subsequent one stacks behind the previous */
+    .switcher-logo:nth-child(1) { z-index: 4; }
+    .switcher-logo:nth-child(2) { z-index: 3; }
+    .switcher-logo:nth-child(3) { z-index: 2; }
+
+    .switcher-logo img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+
+    /* dark mask dims inactive logos at full opacity, so the circle/border stay
+       crisp instead of blending with whatever sits behind the switcher */
+    .switcher-logo::after {
+      content: ''; position: absolute; inset: 0; border-radius: 50%;
+      background: rgba(0,0,0,0.55); pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* hover lifts the circle, floats it above its overlapping neighbours, and lifts the mask */
+    .switcher-logo:hover { transform: translateY(-5px); z-index: 10; }
+    .switcher-logo:hover::after { opacity: 0; }
+
+    .switcher-logo.switcher-active { transform: scale(1.12); }
+    .switcher-logo.switcher-active::after { opacity: 0; }
+
+    .switcher-logo.switcher-active:hover { transform: translateY(-5px) scale(1.12); z-index: 10; }
+
+    .switcher-logo-tip {
+      position: absolute; bottom: calc(100% + 10px); top: auto; left: 50%;
+      transform: translateX(-50%) scale(0.4);
+      transform-origin: bottom center;
+      background: #ffffff;
+      color: var(--bg-from);
+      font-family: 'Google Sans Flex', 'Helvetica Neue', sans-serif;
+      font-size: 11px; font-weight: 400; letter-spacing: -0.01em;
+      padding: 4px 9px;
+      border-radius: 6px;
+      white-space: nowrap; opacity: 0; pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .switcher-logo-tip::after {
+      content: '';
+      position: absolute; top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #ffffff;
+    }
+
+    .switcher-logo:hover .switcher-logo-tip { opacity: 1; transform: translateX(-50%) scale(1); }
+
+    .switcher-logo.switcher-active:hover .switcher-logo-tip { transform: translateX(-50%) scale(0.893); }
+
+    @media (max-width: 720px) {
+      .sc-card { width: 100%; height: clamp(300px, 60vh, 460px); top: 180px; }
+      .sc-project { grid-template-columns: 1fr; grid-template-rows: 200px 1fr; }
+      .sc-testimonial { padding: 40px 28px; }
+      .sc-t-quote { font-size: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sc-card { transition: none; }
+      .sc-card.sc-active  { transform: translate(-50%, -50%); opacity: 1; }
+      .sc-card.sc-exiting { opacity: 0; }
+    }
+
+    /* ───────── RESPONSIVE ───────── */
+    @media (max-width: 1260px) {
+      .switcher { display: none; }
+    }
+    @media (max-width: 920px) {
+      .grid-row { grid-template-columns: 1fr; gap: 32px; }
+      .layout { padding-left: var(--gutter); padding-right: var(--gutter); padding-top: 100px; }
+      .hello-col { position: static; bottom: auto; }
+      .about-section { padding: 28px 24px; }
+      #aboutView { position: static; top: auto; bottom: auto; left: auto; overflow: visible; }
+      #aboutFirstSection { margin-top: 0; }
+    }
+
+    @media (max-width: 720px) {
+      .nav-links { gap: 14px; }
+      .nav-link { font-size: 14px; }
+      .exp-item { grid-template-columns: 1fr; gap: 4px; }
+      .exp-date { padding-top: 0; }
+      /* Project card: image on top, body below (Work view) */
+      .sc-project { grid-template-columns: 1fr; grid-template-rows: 200px 1fr; }
+      .sc-testimonial { padding: 32px 28px; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       MOBILE / TABLET RESPONSIVE OVERRIDES (≤ 920px) — mirrors index.html
+       Release the fixed Hello column's width, centre the Work/About pill (JS
+       positions it with a desktop-only formula), and turn the scroll-jacking
+       Work carousel into a plain vertical stack. !important beats the inline
+       styles the carousel JS writes.
+       ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 920px) {
+      .hello-col { width: auto; left: auto; top: auto; }
+
+      .main-nav {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        animation: none !important;
+        max-width: calc(100vw - 24px);
+      }
+
+      .switcher { display: none !important; }
+
+      .sc-scroll-space {
+        height: auto !important;
+        position: static !important;
+        pointer-events: auto !important;
+        padding-bottom: 40px;
+      }
+      .sc-canvas {
+        position: static !important;
+        left: auto !important;
+        width: auto !important;
+        height: auto !important;
+        max-width: var(--max-w);
+        margin: 0 auto;
+        padding: 0 var(--gutter);
+        overflow: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        transition: none !important;
+      }
+      .sc-card {
+        position: static !important;
+        transform: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        z-index: auto !important;
+        transition: none !important;
+      }
+      .sc-project-hover { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ───────── NAV — Work / About (identical markup on every page) ───────── -->
+<nav class="main-nav" aria-label="Site navigation">
+  <div class="nav-links">
+    <a class="nav-link" data-view="work" href="index.html">Work</a>
+    <a class="nav-link" data-view="about" href="about.html">About</a>
+  </div>
+</nav>
+
+<!-- ───────── MAIN LAYOUT: fixed Hello + scrolling content ───────── -->
+<div class="hero-wrap">
+<main class="layout grid-row">
+
+  <!-- LEFT: Hello (identical to Home, stays fixed in the viewport) -->
+  <aside class="hello-col">
+    <h1 class="hello-heading reveal">
+      <svg class="hello-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M19 23H7v-2h12v2ZM7 21H5v-2h2v2Zm14 0h-2v-2h2v2ZM5 19H3v-2h2v2Zm18 0h-2V7h2v12ZM3 17H1v-4h2v4Zm6 0H7v-2h2v2Zm-2-2H5v-2H3v-2h2V5h2v10Zm14-8h-2v5h-2V5h4v2Zm-10 4H9V5H7V3h4v8Zm6-6h-2v6h-2V3h4v2Zm-4-2h-2V1h2v2Z"/></svg>
+      <span>Hello, if you are</span>
+      <span class="inline-chip-wrap" id="inlineChipWrap">
+        <button class="inline-chip" id="inlineChip" type="button">
+          <span class="inline-chip-text" id="inlineChipText">Just browsing</span>
+          <svg class="inline-chip-caret" id="inlineChipCaret" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <span class="inline-dropdown" id="inlineDropdown" role="listbox">
+          <button type="button" data-idx="0" class="active">Just browsing<svg class="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" data-idx="1">Hiring Manager<svg class="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" data-idx="2">Product Designer<svg class="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" data-idx="3">Software Engineer<svg class="check" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </span>
+      </span>
+    </h1>
+
+    <div class="bio reveal" data-reveal-delay="2" id="bio">
+      <p class="bio-text active" data-bio="0">
+        Hi, I'm Alyona. Senior UX Designer at Maersk. I design interfaces for people with complex jobs, with 6+ years across B2B SaaS and B2C in Maritime Tech, EdTech, and Retail. Right now I'm figuring out how to design in this new AI world. Always up for a chat (and coffee) about it. Feel free to drop a line.
+      </p>
+      <p class="bio-text" data-bio="1">
+        Senior UX Designer at Maersk, with a builder mindset. 6+ years designing products across mobile and web, most recently a complex B2B contract platform for sales teams. Comfortable working solo as the only designer, or embedded in cross-functional teams with designers, engineers and PMs. Open to Senior roles with end-to-end ownership.
+      </p>
+      <p class="bio-text" data-bio="2">
+        I work end-to-end, from research through to testing what engineers ship. Right now I'm leading design on a contracting platform for salespeople, with lots of edge cases and stakeholders to navigate. Love collaborating with other designers. Lately I've been exploring Claude Code and Cursor to get closer to how things actually get built.
+      </p>
+      <p class="bio-text" data-bio="3">
+        I work end-to-end, through to defining specs that are actually feasible to build. I care about handoffs that don't create extra back-and-forth, which is part of why I've been learning Cursor and Claude Code, to understand your constraints, not just state intentions.
+      </p>
+    </div>
+
+    <div class="cta-row reveal" data-reveal-delay="3">
+      <a class="btn btn-primary" href="#" id="previewCvBtn">Preview CV</a>
+      <button class="btn btn-ghost btn-copy" id="copyEmailBtn" type="button">
+        <span class="btn-copy-icon-wrap">
+          <svg class="btn-copy-icon btn-copy-icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          <svg class="btn-copy-icon btn-copy-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </span>
+        <span class="btn-copy-label">Copy email</span>
+      </button>
+    </div>
+    <div class="experience-block reveal" data-reveal-delay="4">
+      <ul class="experience-list">
+        <li>Senior UX Designer @<a class="experience-link" href="https://www.maersk.com/" target="_blank" rel="noopener noreferrer">Maersk</a></li>
+        <li>Copenhagen · <a class="experience-link" href="https://www.linkedin.com/in/alyona-flak/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- RIGHT: Work — hidden until nav is switched to "Work" -->
+  <div class="content-col" id="workView" style="display:none">
+    <section class="works" id="works"></section>
+  </div>
+
+  <!-- RIGHT: About content -->
+  <div class="content-col" id="aboutView">
+
+    <!-- Experience -->
+    <section class="about-section reveal" id="aboutFirstSection">
+      <h2 class="section-h2">Career Journey</h2>
+      <div class="exp-list">
+        <span class="exp-rail-fill" aria-hidden="true"></span>
+
+        <div class="exp-item">
+          <div class="exp-date">2025 — now</div>
+          <div class="exp-body">
+            <div class="exp-role">Senior UX Designer</div>
+            <div class="exp-company">A.P. Moller – Maersk · B2B SaaS</div>
+            <div class="exp-desc">Leading design of the amendments module within Maersk's sales platform, exploring AI-assisted prototyping to speed up the feedback loop. Conducts user research and works closely with SMEs, product managers, tech leads, and platform architects to shape solutions.</div>
+          </div>
+        </div>
+
+        <div class="exp-item">
+          <div class="exp-date">2024 — 2025</div>
+          <div class="exp-body">
+            <div class="exp-role">Product Designer <span class="exp-tag">First Design Hire</span></div>
+            <div class="exp-company">Danelec · Maritime Tech</div>
+            <ul class="exp-desc-list">
+              <li>Led the full redesign of the vessel performance web platform to improve usability</li>
+              <li>Created a refreshed Design System with a frontend engineer, reducing hand-off time by 50%</li>
+              <li>Built a user feedback loop through Customer Success teams and in-app feedback collection, increasing user-driven roadmap initiatives from 0 to 30%</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item">
+          <div class="exp-date">2022 — 2024</div>
+          <div class="exp-body">
+            <div class="exp-role">Product Designer</div>
+            <div class="exp-company">Atobi · EdTech / Retail</div>
+            <ul class="exp-desc-list">
+              <li>Increased mobile app adoption by 7% through gamified learning</li>
+              <li>Introduced usability testing and design QA into the development cycle</li>
+              <li>Led the design of a native content creation feature that replaced an external CRM and was widely adopted</li>
+              <li>Built a Design System from scratch in collaboration with engineers, reducing hand-off time</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item">
+          <div class="exp-date">2020 — 2022</div>
+          <div class="exp-body">
+            <div class="exp-role">Experience Designer</div>
+            <div class="exp-company"><img src="assets/logo-epam.png" alt="EPAM" class="exp-logo" />EPAM Systems · Tech Agency</div>
+            <ul class="exp-desc-list">
+              <li>Redesigned marketplace for software solutions, which resulted in 25% increase of solution requests</li>
+              <li>Guest lecturer at "Platea" design community events</li>
+              <li>Contributed to "epamdesignkyiv" Telegram channel with over 1000 followers</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item">
+          <div class="exp-date">2019 — 2020</div>
+          <div class="exp-body">
+            <div class="exp-role">Visual Aids Associate</div>
+            <div class="exp-company"><img src="assets/logo-pwc.png" alt="PwC" class="exp-logo" />PwC · Professional Services</div>
+            <ul class="exp-desc-list">
+              <li>Designed pitch decks for internal consultants</li>
+              <li>Managed team of 7 designers, assisted in communication with consultants</li>
+              <li>Designed internal website for announcements</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Beyond work -->
+    <section class="about-section reveal">
+      <div class="beyond-cards">
+        <div class="beyond-card">
+          <div class="beyond-card-flag">
+            <svg width="50" height="33" viewBox="0 0 50 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_card1)">
+                <path d="M0 16.3794H49.9999V31.8967C49.9999 32.3727 49.6139 32.7588 49.1378 32.7588H0.862108C0.386034 32.7588 0 32.3727 0 31.8967V16.3794Z" fill="#FFDD00"/>
+                <path d="M49.9999 16.3794H0V0.862107C0 0.386034 0.386034 0 0.862108 0H49.1379C49.614 0 50 0.386034 50 0.862107L49.9999 16.3794Z" fill="#0037FF"/>
+              </g>
+              <defs><clipPath id="clip0_card1"><rect width="50" height="32.7588" rx="8" fill="white"/></clipPath></defs>
+            </svg>
+            <span class="beyond-card-place">Ukraine</span>
+          </div>
+          <p class="beyond-card-text">Hiking in Carpathians</p>
+        </div>
+        <div class="beyond-card">
+          <div class="beyond-card-flag">
+            <svg width="50" height="33" viewBox="0 0 50 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_card2)">
+                <path d="M49.1378 32.7586H0.862108C0.386034 32.7586 0 32.3726 0 31.8965V0.862107C0 0.386034 0.386034 0 0.862108 0H49.1379C49.614 0 50 0.386034 50 0.862107V31.8965C49.9999 32.3727 49.6139 32.7586 49.1378 32.7586Z" fill="#FF000E"/>
+                <path d="M49.9999 13.793H20.6896V0H15.5173V13.793H0V18.9655H15.5173V32.7585H20.6896V18.9655H49.9999V13.793Z" fill="white"/>
+              </g>
+              <defs><clipPath id="clip0_card2"><rect width="50" height="32.7586" rx="8" fill="white"/></clipPath></defs>
+            </svg>
+            <span class="beyond-card-place">Denmark</span>
+          </div>
+          <p class="beyond-card-text">Training for my first 2 km swim</p>
+        </div>
+        <div class="beyond-card">
+          <div class="beyond-card-flag">
+            <svg width="50" height="33" viewBox="0 0 50 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_card3)">
+                <path d="M0 16.3794H49.9999V31.8967C49.9999 32.3727 49.6139 32.7588 49.1378 32.7588H0.862108C0.386034 32.7588 0 32.3727 0 31.8967V16.3794Z" fill="#FFDD00"/>
+                <path d="M49.9999 16.3794H0V0.862107C0 0.386034 0.386034 0 0.862108 0H49.1379C49.614 0 50 0.386034 50 0.862107L49.9999 16.3794Z" fill="#0037FF"/>
+              </g>
+              <defs><clipPath id="clip0_card3"><rect width="50" height="32.7588" rx="8" fill="white"/></clipPath></defs>
+            </svg>
+            <span class="beyond-card-place">Wherever I am</span>
+          </div>
+          <p class="beyond-card-text">Knitting comes along</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+</div><!-- /.hero-wrap -->
+
+<div class="cv-modal-overlay" id="cvModalOverlay">
+  <div class="cv-modal">
+    <div class="cv-modal-header">
+      <span class="cv-modal-title">Alyona Flak — CV</span>
+      <div class="cv-modal-actions">
+        <a class="cv-modal-download" href="https://drive.google.com/uc?export=download&id=1im4NV8gFBsMfHCs_SKHAxiHR_pdzR2cr" download>Download</a>
+        <button class="cv-modal-close" id="cvModalClose" type="button" aria-label="Close preview">&times;</button>
+      </div>
+    </div>
+    <iframe class="cv-modal-frame" id="cvModalFrame" src="" title="CV preview" loading="lazy"></iframe>
+  </div>
+</div>
+
+<!-- Work view's stacked case studies — hidden until nav is switched to "Work" -->
+<div class="sc-scroll-space" id="scScrollSpace" style="display:none">
+        <div class="sc-canvas" id="scCanvas">
+
+          <!-- [0] Fleet Insights — project -->
+          <a class="sc-card sc-project" id="scCard0" href="case-study-fleet-insights.html">
+            <div class="sc-project-image">
+              <img src="uploads/fleet-insights-cover-1.jpg" alt="" loading="lazy" />
+              <img src="uploads/fleet-insights-cover-2.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="sc-project-body">
+              <p class="sc-project-meta">2025 · Web App · Danelec</p>
+              <h2 class="sc-project-title">Fleet Insights 2.0</h2>
+              <p class="sc-project-sub">Redesign of Vessel Performance Platform. Reduced time-to-insight by 30%.</p>
+              <div class="sc-project-foot">
+                <span class="sc-project-cta">View case study
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </div>
+            </div>
+            <div class="sc-project-hover" aria-hidden="true">Click to open</div>
+          </a>
+
+          <!-- [1] Fleet Insights — testimonial -->
+          <div class="sc-card sc-testimonial" id="scCard1">
+            <p class="sc-t-ref">Fleet Insights</p>
+            <div class="sc-t-quotemark">"</div>
+            <p class="sc-t-quote">A masterclass in pragmatic design — she made hard trade-offs visible to the whole team, and our customers loved the result.</p>
+            <div class="sc-t-author">
+              <span class="sc-t-name">Jakob Rasmussen</span>
+              <span class="sc-t-role">Head of Product, Danelec</span>
+            </div>
+          </div>
+
+          <!-- [2] Atobi Actions — project -->
+          <a class="sc-card sc-project" id="scCard2" href="case-study-atobi-actions.html">
+            <div class="sc-project-image">
+              <img src="uploads/atobi-cover-1.jpg" alt="" loading="lazy" />
+              <img src="uploads/atobi-cover-2.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="sc-project-body">
+              <p class="sc-project-meta">2024 · Mobile PWA · Atobi</p>
+              <h2 class="sc-project-title">Atobi Actions</h2>
+              <p class="sc-project-sub">New content format for retail frontline learning. 387% increase in response rate.</p>
+              <div class="sc-project-foot">
+                <span class="sc-project-cta">View case study
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </div>
+            </div>
+            <div class="sc-project-hover" aria-hidden="true">Click to open</div>
+          </a>
+
+          <!-- [3] Atobi Actions — testimonial -->
+          <div class="sc-card sc-testimonial" id="scCard3">
+            <p class="sc-t-ref">Atobi Actions</p>
+            <div class="sc-t-quotemark">"</div>
+            <p class="sc-t-quote">387% increase in response rate compared to the previous module format — and it spread beyond training into operational docs without anyone asking it to.</p>
+            <div class="sc-t-author">
+              <span class="sc-t-name">Post-launch metrics</span>
+              <span class="sc-t-role">Atobi, 2024</span>
+            </div>
+          </div>
+
+          <!-- [4] Contract Amendments Platform — project (coming soon) -->
+          <div class="sc-card sc-project sc-project-disabled" id="scCard4">
+            <div class="sc-project-image">
+              <img src="uploads/dorien-monnens-53-v5b5qfqc-unsplash.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="sc-project-body">
+              <p class="sc-project-meta">2026 · Web App · Maersk</p>
+              <h2 class="sc-project-title">Contract Amendments Platform</h2>
+              <p class="sc-project-sub">From spreadsheet chaos to confident decisions.</p>
+              <div class="sc-project-foot">
+                <span class="sc-project-cta">Coming soon</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+</div>
+
+<!-- Fixed bottom project nav (visible while stacked section is active) -->
+<nav class="switcher" id="scNav" aria-label="Case study navigation" style="display:none">
+  <span class="switcher-counter"><span id="scNavIdx">1</span> of 3</span>
+  <div class="switcher-logos">
+    <button class="switcher-logo" data-nav-idx="0" aria-label="Danelec">
+      <span class="switcher-logo-tip">Danelec</span>
+      <img src="assets/logo-danelec.png" alt="Danelec" />
+    </button>
+    <button class="switcher-logo" data-nav-idx="1" aria-label="Atobi">
+      <span class="switcher-logo-tip">Atobi</span>
+      <img src="assets/logo-atobi.png" alt="Atobi" />
+    </button>
+    <button class="switcher-logo" data-nav-idx="2" aria-label="Contract Amendments Platform">
+      <span class="switcher-logo-tip">Contract Amendments Platform</span>
+      <img src="assets/logo-maersk.png" alt="Maersk" />
+    </button>
+  </div>
+</nav>
+
+<script>
+  /* ───────── Hello inline-dropdown ───────── */
+  const inlineChipWrap = document.getElementById('inlineChipWrap');
+  const inlineChip     = document.getElementById('inlineChip');
+  const inlineChipText = document.getElementById('inlineChipText');
+  const inlineDropdown = document.getElementById('inlineDropdown');
+  const dropdownItems  = [...inlineDropdown.querySelectorAll('button')];
+  const bios           = [...document.querySelectorAll('.bio-text')];
+  const ROLES = ['Just browsing','Hiring Manager','Product Designer','Software Engineer'];
+  let cur = 0;
+
+  function setChipLabel(idx) {
+    const label = ROLES[idx];
+    if (inlineChipText.textContent === label) return;
+    inlineChipText.classList.add('swap');
+    setTimeout(() => {
+      inlineChipText.textContent = label;
+      inlineChipText.classList.remove('swap');
+    }, 200);
+  }
+
+  function activate(idx) {
+    if (idx === cur) return;
+    bios[cur].classList.remove('active');
+    setTimeout(() => bios[idx].classList.add('active'), 80);
+    dropdownItems.forEach((it, i) => it.classList.toggle('active', i === idx));
+    cur = idx;
+    setChipLabel(idx);
+  }
+
+  inlineChip.addEventListener('click', (e) => {
+    e.stopPropagation();
+    activate((cur + 1) % ROLES.length);
+    inlineChipWrap.classList.remove('open');
+  });
+
+  document.getElementById('inlineChipCaret').addEventListener('click', (e) => {
+    e.stopPropagation();
+    inlineChipWrap.classList.toggle('open');
+  });
+
+  dropdownItems.forEach((it, i) => {
+    it.addEventListener('click', (e) => {
+      e.stopPropagation();
+      activate(i);
+      inlineChipWrap.classList.remove('open');
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!inlineChipWrap.contains(e.target)) inlineChipWrap.classList.remove('open');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') inlineChipWrap.classList.remove('open');
+  });
+
+  /* ───────── Copy email ───────── */
+  const copyBtn = document.getElementById('copyEmailBtn');
+  if (copyBtn) {
+    const EMAIL = 'alyonaflak@gmail.com';
+    const label = copyBtn.querySelector('.btn-copy-label');
+    const originalLabel = label.textContent;
+    let copyTimer;
+    copyBtn.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(EMAIL); } catch (e) {}
+      clearTimeout(copyTimer);
+      label.textContent = 'Copied';
+      copyBtn.classList.add('copied');
+      copyTimer = setTimeout(() => {
+        label.textContent = originalLabel;
+        copyBtn.classList.remove('copied');
+      }, 1800);
+    });
+  }
+
+  /* ───────── CV preview modal ───────── */
+  const previewCvBtn  = document.getElementById('previewCvBtn');
+  const cvModalOverlay = document.getElementById('cvModalOverlay');
+  const cvModalClose   = document.getElementById('cvModalClose');
+  const cvModalFrame   = document.getElementById('cvModalFrame');
+  const CV_FILE_ID = '1im4NV8gFBsMfHCs_SKHAxiHR_pdzR2cr';
+  const CV_PREVIEW_URL = `https://drive.google.com/file/d/${CV_FILE_ID}/preview`;
+
+  function openCvModal() {
+    if (!cvModalFrame.getAttribute('src')) cvModalFrame.src = CV_PREVIEW_URL;
+    cvModalOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeCvModal() {
+    cvModalOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  if (previewCvBtn) {
+    previewCvBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openCvModal();
+    });
+  }
+  if (cvModalClose) cvModalClose.addEventListener('click', closeCvModal);
+  if (cvModalOverlay) {
+    cvModalOverlay.addEventListener('click', (e) => {
+      if (e.target === cvModalOverlay) closeCvModal();
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && cvModalOverlay.classList.contains('open')) closeCvModal();
+  });
+
+  /* ───────── Center the Work/About pill on the About view
+     (the Work view positions it via the canvas's own measure()) ───────── */
+  function centerMainNav() {
+    const margin = 84, helloW = 360, colGap = 100;
+    const contentLeft  = margin + helloW + colGap;
+    const contentWidth = window.innerWidth - contentLeft - margin;
+    const colCenter     = contentLeft + contentWidth / 2;
+    const mainNav = document.querySelector('.main-nav');
+    if (mainNav) mainNav.style.left = (colCenter - mainNav.offsetWidth / 2) + 'px';
+  }
+
+  /* ───────── Scroll-reveal ─────────
+     Re-usable so the page router can re-apply it to content it swaps in. */
+  let revealObserver = null;
+  function observeReveals(root) {
+    const els = (root || document).querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      els.forEach(el => el.classList.add('in'));
+      return;
+    }
+    if (!revealObserver) {
+      revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    }
+    els.forEach(el => revealObserver.observe(el));
+  }
+  observeReveals();
+
+  /* ───── Career-journey scroll timeline ─────
+     Fills the rail and lights up each node as that entry scrolls past a
+     reading line. Works whether #aboutView scrolls internally (desktop,
+     position:fixed) or the whole page scrolls (mobile, position:static). */
+  function updateExpTimeline() {
+    const view = document.getElementById('aboutView');
+    if (!view || view.style.display === 'none') return;
+    const list = view.querySelector('.exp-list');
+    const fill = view.querySelector('.exp-rail-fill');
+    if (!list || !fill) return;
+    const items = [...list.querySelectorAll('.exp-item')];
+    if (!items.length) return;
+
+    const fixed = getComputedStyle(view).position === 'fixed';
+    const frame = view.getBoundingClientRect();
+    const readLineY = fixed
+      ? frame.top + frame.height * 0.42
+      : window.innerHeight * 0.42;
+
+    const listRect = list.getBoundingClientRect();
+    /* Anchor the rail to the exact centre of the first and last node dots
+       (top:2px / top:22px in CSS, dot height 10px) so it never sticks out
+       past the first or last circle. */
+    const firstItem = items[0];
+    const lastItem = items[items.length - 1];
+    const railTop = (firstItem.getBoundingClientRect().top - listRect.top) + 7;
+    const railBottomY = (lastItem.getBoundingClientRect().top - listRect.top) + 27;
+    list.style.setProperty('--rail-top', railTop + 'px');
+    list.style.setProperty('--rail-bottom', (listRect.height - railBottomY) + 'px');
+
+    const trackPx = Math.max(0, railBottomY - railTop);
+    let h = readLineY - (listRect.top + railTop);
+    h = Math.max(0, Math.min(trackPx, h));
+
+    /* When the user has scrolled to the bottom of the viewport, snap the rail
+       to fully filled so the timeline never stops short of the last entry. */
+    const atBottom = fixed
+      ? view.scrollTop + view.clientHeight >= view.scrollHeight - 2
+      : window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    if (atBottom) h = trackPx;
+    fill.style.height = h + 'px';
+
+    const fillBottomY = listRect.top + railTop + h;
+    items.forEach(item => {
+      const role = item.querySelector('.exp-role');
+      const y = (role || item).getBoundingClientRect().top + 6;
+      item.classList.toggle('tl-active', atBottom || y <= fillBottomY + 2);
+    });
+  }
+  window.requestExpTimeline = function () { requestAnimationFrame(updateExpTimeline); };
+  window.addEventListener('scroll', updateExpTimeline, { passive: true });
+  const aboutScroller = document.getElementById('aboutView');
+  if (aboutScroller) aboutScroller.addEventListener('scroll', updateExpTimeline, { passive: true });
+
+  /* ───────── Stacked Cards Scroll Animation (Work view) ─────────
+     Dormant on initial load (the Work markup is in the page but
+     hidden via display:none) — the view toggle below calls
+     initWorkAnimation() when the nav is switched to "Work". */
+  /* Below this width the sticky scroll-jacking carousel becomes a plain
+     vertical stack (see the responsive @media block in <style>). Skip wiring
+     the scroll handlers so they don't hijack the page scroll on mobile. */
+  const mqStackCards = window.matchMedia('(max-width: 920px)');
+
+  let teardownWorkAnimation = function () {};
+  function initWorkAnimation() {
+    const scrollSpace = document.getElementById('scScrollSpace');
+    const nav         = document.getElementById('scNav');
+    if (!scrollSpace || !nav) return;
+    if (mqStackCards.matches) return; /* mobile: static stack, no scroll-jacking */
+
+    const cards     = [...document.querySelectorAll('.sc-card')];
+    const navLogos  = [...document.querySelectorAll('.switcher-logo')];
+    const navIdxEl  = document.getElementById('scNavIdx');
+    const N = cards.length;
+
+    const CYCLES = 3;
+    const TOTAL_SEGMENTS = CYCLES * N;
+
+    let sectionTop = 0, sectionH = 0, vh = window.innerHeight;
+    let SEG = 1;
+    let cycleLen = 1;
+
+    function measure() {
+      const r = scrollSpace.getBoundingClientRect();
+      sectionTop = r.top + window.scrollY;
+      sectionH   = scrollSpace.offsetHeight;
+      vh         = window.innerHeight;
+      const scrollable = Math.max(1, sectionH - vh);
+      SEG = scrollable / TOTAL_SEGMENTS;
+      cycleLen = N * SEG;
+      const canvasEl = document.getElementById('scCanvas');
+      const margin   = 84;
+      const helloW   = 360;
+      const colGap   = 100;
+      const canvasLeft  = margin + helloW + colGap;
+      const canvasWidth = window.innerWidth - canvasLeft - margin;
+      const colCenter   = canvasLeft + canvasWidth / 2;
+      if (canvasEl) {
+        canvasEl.style.left  = canvasLeft + 'px';
+        canvasEl.style.width = canvasWidth + 'px';
+      }
+      nav.style.left = (colCenter - nav.offsetWidth / 2) + 'px';
+      const mainNav = document.querySelector('.main-nav');
+      if (mainNav) mainNav.style.left = (colCenter - mainNav.offsetWidth / 2) + 'px';
+    }
+
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+    let lastActiveIdx = -1;
+    const exitTimers  = {};
+    let scrollDir     = 1;
+    let lastScrollY   = window.scrollY;
+
+    function setActiveCard(newIdx) {
+      if (newIdx === lastActiveIdx) return;
+      const prevIdx  = lastActiveIdx;
+      const goingUp  = scrollDir === -1 && prevIdx !== -1;
+      lastActiveIdx  = newIdx;
+
+      const wrap = idx => ((idx % N) + N) % N;
+      cards.forEach((card, i) => {
+        if (exitTimers[i]) { clearTimeout(exitTimers[i]); delete exitTimers[i]; }
+        card.classList.remove('sc-active', 'sc-exiting', 'sc-exiting-back', 'sc-enter-top', 'sc-next', 'sc-next2', 'sc-next3');
+
+        if (i === wrap(newIdx)) {
+          if (goingUp) {
+            card.classList.add('sc-enter-top');
+            requestAnimationFrame(() => {
+              card.classList.remove('sc-enter-top');
+              card.classList.add('sc-active');
+            });
+          } else {
+            card.classList.add('sc-active');
+          }
+        } else if (i === wrap(prevIdx) && prevIdx !== -1) {
+          card.classList.add(goingUp ? 'sc-exiting-back' : 'sc-exiting');
+          exitTimers[i] = setTimeout(() => {
+            card.classList.remove('sc-exiting', 'sc-exiting-back');
+            delete exitTimers[i];
+          }, 820);
+        } else if (i === wrap(newIdx + 1)) {
+          card.classList.add('sc-next');
+        } else if (i === wrap(newIdx + 2)) {
+          card.classList.add('sc-next2');
+        }
+      });
+    }
+
+    function indexFromScroll() {
+      let y = window.scrollY - sectionTop;
+      if (y > (CYCLES - 1) * cycleLen) {
+        /* Must be an instant jump, not a smooth-scrolled one — html has
+           scroll-behavior:smooth globally, which would otherwise animate
+           this rewind over the full cycle distance and fight with the
+           user's continued scrolling (the "stuck on the 3rd loop" bug). */
+        const prevBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = 'auto';
+        window.scrollTo(0, window.scrollY - cycleLen);
+        document.documentElement.style.scrollBehavior = prevBehavior;
+        lastScrollY -= cycleLen;
+        y -= cycleLen;
+      }
+      const yc = Math.max(0, y);
+      return ((Math.floor(yc / SEG) % N) + N) % N;
+    }
+
+    function render() {
+      const activeIdx = indexFromScroll();
+      const navIdx = clamp(Math.floor(activeIdx / 2), 0, navLogos.length - 1);
+      navLogos.forEach((el, i) => el.classList.toggle('switcher-active', i === navIdx));
+      if (navIdxEl) navIdxEl.textContent = navIdx + 1;
+      setActiveCard(activeIdx);
+    }
+
+    let raf = null;
+    function onScroll() {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        const y = window.scrollY;
+        scrollDir   = y >= lastScrollY ? 1 : -1;
+        lastScrollY = y;
+        render();
+        raf = null;
+      });
+    }
+    function onResize() { measure(); render(); }
+
+    const logoHandlers = [];
+    navLogos.forEach((logo, i) => {
+      const handler = () => {
+        const cardIdx = i * 2;
+        const targetY = sectionTop + cycleLen + cardIdx * SEG + SEG * 0.5;
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+      };
+      logo.addEventListener('click', handler);
+      logoHandlers.push([logo, handler]);
+    });
+
+    const hoverHandlers = [];
+    document.querySelectorAll('.sc-project').forEach(card => {
+      const hov = card.querySelector('.sc-project-hover');
+      if (!hov) return;
+      const handler = e => {
+        const r = card.getBoundingClientRect();
+        hov.style.left = (e.clientX - r.left) + 'px';
+        hov.style.top  = (e.clientY - r.top) + 'px';
+      };
+      card.addEventListener('mousemove', handler);
+      hoverHandlers.push([card, handler]);
+    });
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+
+    measure();
+    render();
+    setActiveCard(0);
+
+    const canvasEl = document.getElementById('scCanvas');
+    function setCanvasVisibility(visible) {
+      canvasEl.classList.toggle('sc-canvas-hidden', !visible);
+      nav.classList.toggle('switcher-section-hidden', !visible);
+    }
+    const visIo = new IntersectionObserver(([entry]) => {
+      setCanvasVisibility(entry.isIntersecting);
+    }, { threshold: 0 });
+    visIo.observe(scrollSpace);
+    const r0 = scrollSpace.getBoundingClientRect();
+    setCanvasVisibility(r0.bottom > 0 && r0.top < window.innerHeight);
+
+    teardownWorkAnimation = function () {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      logoHandlers.forEach(([el, h]) => el.removeEventListener('click', h));
+      hoverHandlers.forEach(([el, h]) => el.removeEventListener('mousemove', h));
+      visIo.disconnect();
+      teardownWorkAnimation = function () {};
+    };
+  }
+
+  /* ───────── View toggle — keeps the sticky Hello sidebar mounted,
+     un-animated and untouched across Work ⇄ About. Both views are
+     already in the page; switching just shows/hides them — no fetch,
+     no reload, no re-render of the Hello column. ───────── */
+  let currentView = document.getElementById('aboutView').style.display === 'none' ? 'work' : 'about';
+
+  function setActiveNavLink(view) {
+    document.querySelectorAll('.main-nav .nav-link').forEach(a => {
+      a.classList.toggle('active', a.dataset.view === view);
+    });
+  }
+
+  function setView(view, push) {
+    if (view === currentView) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    const workView    = document.getElementById('workView');
+    const aboutView   = document.getElementById('aboutView');
+    const scrollSpace = document.getElementById('scScrollSpace');
+    const switcher    = document.getElementById('scNav');
+
+    teardownWorkAnimation();
+    if (view === 'work') {
+      aboutView.style.display = 'none';
+      workView.style.display = '';
+      if (scrollSpace) scrollSpace.style.display = '';
+      if (switcher) switcher.style.display = '';
+      initWorkAnimation();
+    } else {
+      workView.style.display = 'none';
+      if (scrollSpace) scrollSpace.style.display = 'none';
+      if (switcher) switcher.style.display = 'none';
+      aboutView.style.display = '';
+      centerMainNav();
+      observeReveals(aboutView);
+      window.requestExpTimeline();
+    }
+
+    currentView = view;
+    setActiveNavLink(view);
+    document.title = view === 'about' ? 'About — Alyona Flak' : 'Alyona Flak — Portfolio';
+    window.scrollTo(0, 0);
+
+    if (push) {
+      const url = view === 'about' ? 'about.html' : 'index.html';
+      history.pushState({ view }, document.title, url);
+    }
+  }
+
+  document.querySelectorAll('.main-nav .nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      setView(link.dataset.view, true);
+    });
+  });
+
+  window.addEventListener('popstate', () => {
+    const onAbout = location.pathname.split('/').pop() === 'about.html';
+    setView(onAbout ? 'about' : 'work', false);
+  });
+
+  window.addEventListener('resize', () => { if (currentView === 'about') { centerMainNav(); updateExpTimeline(); } });
+
+  /* Crossing the stack breakpoint: tear down or (re)build the Work carousel. */
+  mqStackCards.addEventListener('change', () => {
+    if (currentView !== 'work') return;
+    teardownWorkAnimation();
+    initWorkAnimation();
+  });
+
+  setActiveNavLink(currentView);
+  if (currentView === 'work') initWorkAnimation();
+  else { centerMainNav(); window.requestExpTimeline(); }
+</script>
+
+</body>
+</html>

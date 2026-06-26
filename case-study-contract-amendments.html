@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contract Amendments — Alyona Flak</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: rgb(107,175,125);
+      --purple-deep: rgb(30,85,50);
+      --ink: rgb(0,0,0);
+      --bg-from: rgb(247,253,250);
+      --bg-to: rgb(218,239,226);
+      --max-w: 1180px;
+      --gutter: 24px;
+      --col-gap: 80px;
+      --left-col: 1fr;
+      --right-col: 2.47fr;
+      --nav-h: 57px;
+      --sticky-top: 113px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(160deg, var(--bg-from) 0%, var(--bg-to) 100%) fixed;
+      font-family: 'Google Sans Flex', 'Helvetica Neue', sans-serif;
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    .grid-row {
+      display: grid;
+      grid-template-columns: var(--left-col) var(--right-col);
+      gap: var(--col-gap);
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s cubic-bezier(0.2,0.7,0.2,1),
+                  transform 0.7s cubic-bezier(0.2,0.7,0.2,1);
+      will-change: opacity, transform;
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal[data-reveal-delay="1"].in { transition-delay: 0.06s; }
+    .reveal[data-reveal-delay="2"].in { transition-delay: 0.12s; }
+    .reveal[data-reveal-delay="3"].in { transition-delay: 0.18s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ── Nav (identical to index.html) ── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      padding-top: 32px;
+      padding-bottom: 16px;
+      align-items: center;
+      animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) both;
+    }
+
+    .nav::before {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100vw;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 4px 14px rgba(55,100,70,0.07);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .nav.scrolled::before { opacity: 1; }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .nav-brand svg { width: 30px; height: 25px; color: var(--purple); }
+
+    .nav-brand .nav-name {
+      font-weight: 500;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      justify-self: end;
+    }
+
+    .nav-link {
+      font-weight: 300;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+      color: rgba(0,0,0,0.85);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s ease;
+    }
+
+    .nav-link:hover { color: var(--purple-deep); }
+    .nav-link.active { color: var(--purple-deep); font-weight: 400; }
+
+    .nav-link svg { width: 14px; height: 15px; color: var(--purple); }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 30px 24px 50px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      color: rgba(0,0,0,0.6);
+    }
+
+    .footer .heart {
+      color: var(--purple);
+      display: inline-block;
+      animation: heartbeat 1.6s ease-in-out infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      14% { transform: scale(1.15); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.1); }
+      70% { transform: scale(1); }
+    }
+
+    /* ── Hero ── */
+    .cs-hero {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      overflow: hidden;
+    }
+
+    .cs-hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 35%;
+      display: block;
+    }
+
+    .cs-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.58) 100%);
+    }
+
+    .cs-hero-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 48px var(--gutter);
+      max-width: calc(var(--max-w) + var(--gutter) * 2);
+      margin: 0 auto;
+    }
+
+    .cs-hero-meta {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 10px;
+    }
+
+    .cs-hero-title {
+      font-size: 44px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      color: #fff;
+      text-wrap: balance;
+      margin-bottom: 10px;
+    }
+
+    .cs-hero-sub {
+      font-size: 18px;
+      font-weight: 300;
+      letter-spacing: -0.015em;
+      color: rgba(255,255,255,0.78);
+    }
+
+    /* ── Back link ── */
+    .cs-back-row {
+      max-width: var(--max-w);
+      margin: 28px auto 0;
+      padding: 0 var(--gutter);
+    }
+
+    .cs-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(0,0,0,0.45);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      transition: color 0.2s ease;
+    }
+
+    .cs-back:hover { color: var(--purple-deep); }
+    .cs-back svg { width: 14px; height: 14px; }
+
+    /* ── Two-column layout ── */
+    .cs-layout {
+      padding-top: 48px;
+      padding-bottom: 120px;
+      align-items: start;
+    }
+
+    /* ── Left: sticky section nav ── */
+    .cs-sidenav {
+      position: sticky;
+      top: var(--sticky-top);
+      align-self: start;
+    }
+
+    .cs-nav-label {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.32);
+      margin-bottom: 16px;
+    }
+
+    .cs-nav-items {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cs-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      color: rgba(0,0,0,0.42);
+      text-decoration: none;
+      padding: 5px 0;
+      transition: color 0.2s ease;
+    }
+
+    .cs-nav-link::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    .cs-nav-link:hover { color: rgba(0,0,0,0.75); }
+
+    .cs-nav-link.active {
+      color: var(--purple-deep);
+      font-weight: 400;
+    }
+
+    .cs-nav-link.active::before {
+      transform: scale(1.6);
+      background: var(--purple);
+    }
+
+    /* ── Content column ── */
+    .cs-content {
+      display: flex;
+      flex-direction: column;
+      gap: 72px;
+    }
+
+    .cs-section-label {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--purple-deep);
+      opacity: 0.65;
+      margin-bottom: 14px;
+    }
+
+    .cs-h2 {
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 20px;
+      text-wrap: balance;
+    }
+
+    .cs-body {
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 1.6;
+      letter-spacing: -0.01em;
+      color: rgba(0,0,0,0.75);
+      text-wrap: pretty;
+    }
+
+    .cs-body + .cs-body { margin-top: 16px; }
+
+    .cs-body strong {
+      font-weight: 500;
+      color: rgba(0,0,0,0.9);
+    }
+
+    /* ── Stat row ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 10px;
+      padding: 20px 22px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 3px 12px rgba(55,100,70,0.05);
+    }
+
+    .stat-num {
+      font-size: 32px;
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      color: var(--purple-deep);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      color: rgba(0,0,0,0.58);
+      line-height: 1.35;
+    }
+
+    /* ── Image block ── */
+    .cs-img-block {
+      margin-top: 28px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.5);
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 4px 14px rgba(55,100,70,0.06);
+    }
+
+    .cs-img-block img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .cs-img-caption {
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      color: rgba(0,0,0,0.42);
+      border-top: 1px solid rgba(0,0,0,0.04);
+    }
+
+    /* ── Insight list ── */
+    .insight-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .insight-item {
+      background: rgba(255,255,255,0.65);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 8px;
+      padding: 14px 18px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      color: rgba(0,0,0,0.72);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .insight-icon {
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--purple-deep);
+      opacity: 0.7;
+    }
+
+    .insight-item strong {
+      font-weight: 500;
+      color: rgba(0,0,0,0.88);
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    /* ── Process steps ── */
+    .process-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .process-step {
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 10px;
+      padding: 20px 22px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 3px 12px rgba(55,100,70,0.05);
+    }
+
+    .process-num {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--purple-deep);
+      opacity: 0.55;
+      margin-bottom: 8px;
+    }
+
+    .process-title {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      color: rgba(0,0,0,0.9);
+      margin-bottom: 8px;
+    }
+
+    .process-desc {
+      font-size: 13.5px;
+      font-weight: 300;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      color: rgba(0,0,0,0.58);
+    }
+
+    /* ── Feature list ── */
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 8px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .feature-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--purple);
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+
+    .feature-text {
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      color: rgba(0,0,0,0.72);
+    }
+
+    .feature-text strong {
+      font-weight: 500;
+      color: rgba(0,0,0,0.88);
+    }
+
+    /* ── Quote ── */
+    .cs-quote {
+      margin-top: 28px;
+      padding: 22px 26px;
+      background: rgba(30,85,50,0.06);
+      border-left: 3px solid var(--purple);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .cs-quote-text {
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.55;
+      letter-spacing: -0.015em;
+      color: rgba(0,0,0,0.8);
+      font-style: italic;
+      margin-bottom: 12px;
+    }
+
+    .cs-quote-author {
+      font-size: 13px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      color: rgba(0,0,0,0.48);
+    }
+
+    .cs-quote-author strong {
+      font-weight: 500;
+      color: rgba(0,0,0,0.72);
+    }
+
+    /* ── Tags ── */
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .tag {
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--purple-deep);
+      background: rgba(107,175,125,0.14);
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+
+    /* ── Bottom navigation ── */
+    .cs-bottom-nav {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 48px var(--gutter) 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .cs-bottom-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-decoration: none;
+      color: inherit;
+      max-width: 340px;
+    }
+
+    .cs-bottom-link-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.32);
+    }
+
+    .cs-bottom-link-title {
+      font-size: 17px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: rgba(0,0,0,0.85);
+      transition: color 0.2s ease;
+      line-height: 1.2;
+    }
+
+    .cs-bottom-link:hover .cs-bottom-link-title { color: var(--purple-deep); }
+
+    .cs-bottom-link-arrow {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--purple-deep);
+      opacity: 0.75;
+      margin-top: 4px;
+    }
+
+    .cs-bottom-link-arrow svg { width: 13px; height: 13px; }
+
+    .cs-bottom-link.next { text-align: right; align-items: flex-end; }
+
+    /* ── Responsive ── */
+    @media (max-width: 920px) {
+      .grid-row { grid-template-columns: 1fr; gap: 32px; }
+      .cs-sidenav { position: static; }
+      .cs-nav-label { display: none; }
+      .cs-nav-items {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .cs-nav-link {
+        padding: 4px 12px;
+        background: rgba(255,255,255,0.6);
+        border-radius: 100px;
+        border: 1px solid rgba(0,0,0,0.08);
+      }
+      .cs-nav-link::before { display: none; }
+      .cs-nav-link.active {
+        background: rgba(30,85,50,0.1);
+        border-color: rgba(30,85,50,0.2);
+      }
+      .stat-row { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .cs-hero { height: 320px; }
+      .cs-hero-title { font-size: 28px; }
+      .stat-row { grid-template-columns: 1fr; }
+      .process-grid { grid-template-columns: 1fr; }
+      .cs-bottom-nav { flex-direction: column; gap: 28px; }
+      .cs-bottom-link.next { align-items: flex-start; text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav class="nav grid-row">
+  <a class="nav-brand" href="index.html">
+    <svg viewBox="0 0 32 26" fill="currentColor"><path d="M 22.454 0.592 C 18.265 -0.576 12.273 0.027 8.267 2.025 C 6.262 3.056 3.614 5.3 2.092 7.33 C -2.228 13.001 0.405 21.216 7.578 24.412 C 14.865 27.641 25.04 25.765 29.236 20.42 C 32.593 16.11 32.939 9.987 30.016 5.688 C 28.994 4.185 28.551 3.801 26.467 2.515 C 24.944 1.582 23.485 0.883 22.454 0.592 Z M 28.373 6.728 C 29.537 8.444 30.306 11.351 30.156 13.603 C 30.016 15.268 29.874 15.681 28.501 18.026 C 27.114 20.396 26.837 20.699 25.391 21.686 C 23.543 22.905 19.602 24.051 16.601 24.218 C 6.078 24.809 -1.248 16.686 3.087 9.28 C 4.965 6.07 9.113 2.803 12.35 1.948 C 14.073 1.513 19.022 1.666 21.267 2.22 C 23.677 2.835 27.28 5.118 28.373 6.728 Z" fill-rule="nonzero"/><path d="M 21.057 10.676 C 20.48 10.578 19.92 11.707 20.261 12.263 C 20.898 13.284 22.428 12.609 22.111 11.44 C 21.974 10.934 21.713 10.753 21.057 10.676 Z" fill-rule="nonzero"/><path d="M 10.949 9.758 C 10.269 10.292 10.237 11.031 10.87 11.49 C 11.588 12.031 12.49 11.458 12.336 10.581 C 12.21 9.883 11.385 9.413 10.949 9.758 Z" fill-rule="nonzero"/><path d="M 16.547 17.982 C 15.729 19.722 15.477 20.039 14.787 20.305 C 14.098 20.571 13.894 20.52 13.459 20.009 C 13.003 19.42 12.626 17.954 12.614 16.664 C 12.605 16.165 12.53 16.122 12.106 16.276 C 11.352 16.538 11.277 18.833 11.953 20.073 C 13.059 22.118 15.183 22.308 16.704 20.508 C 17.418 19.63 18.155 17.516 18.037 16.691 C 17.876 15.711 17.466 16.07 16.547 17.982 Z" fill-rule="nonzero"/></svg>
+    <span class="nav-name">Alyona Flak</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">Home</a>
+    <a class="nav-link active" href="index.html#works">Work</a>
+    <a class="nav-link" href="index.html#lab">
+      <svg viewBox="0 0 15 16" fill="currentColor"><path d="M 2.993 15.458 C 2.879 15.125 2.955 14.051 3.223 13.014 C 3.872 10.236 3.795 10.014 1.924 9.014 C -0.979 7.495 -0.597 6.569 3.07 6.125 L 5.285 5.865 L 6.164 3.125 C 6.622 1.606 7.233 0.236 7.539 0.087 C 8.302 -0.394 9.677 1.162 10.594 3.532 L 11.396 5.717 L 12.924 5.606 C 14.032 5.532 14.528 5.68 14.834 6.125 C 15.216 6.68 14.987 7.051 13.65 8.384 C 11.931 10.088 11.816 10.532 12.504 12.792 C 13.115 14.829 12.542 15.31 10.709 14.236 C 9.945 13.829 9.105 13.458 8.875 13.458 C 8.608 13.458 7.5 14.051 7.348 10.199 C 8.799 11.051 9.754 10.495 9.754 8.828 Z M 4.407 7.903 C 4.407 7.717 4.254 7.532 4.025 7.532 C 3.834 7.532 3.643 7.717 3.643 7.903 C 3.643 8.125 3.834 8.273 4.025 8.273 C 4.254 8.273 4.407 8.125 4.407 7.903 Z M 8.99 4.532 C 8.379 2.569 7.997 2.569 7.615 4.495 C 7.386 5.569 7.462 5.68 8.341 5.68 C 9.257 5.68 9.296 5.606 8.99 4.532 Z" fill-rule="nonzero"/></svg>
+      Lab
+    </a>
+    <a class="nav-link" href="index.html">About</a>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<div class="cs-hero">
+  <img class="cs-hero-img" src="case-studies/elise-bouvet-StQJj4NAYg0-unsplash.jpg" alt="" />
+  <div class="cs-hero-overlay"></div>
+  <div class="cs-hero-content">
+    <div class="cs-hero-meta">2024 · B2B Platform · Maersk</div>
+    <h1 class="cs-hero-title">Contract Amendments</h1>
+    <p class="cs-hero-sub">From spreadsheet chaos to confident decisions</p>
+  </div>
+</div>
+
+<!-- ── Back link ── -->
+<div class="cs-back-row">
+  <a class="cs-back" href="index.html#works">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M10 3L6 8l4 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    All work
+  </a>
+</div>
+
+<!-- ── Two-column layout ── -->
+<div class="cs-layout grid-row">
+
+  <!-- Left: sticky section nav -->
+  <aside class="cs-sidenav">
+    <div class="cs-nav-label">Case study</div>
+    <nav class="cs-nav-items" aria-label="Case study sections">
+      <a class="cs-nav-link active" href="#overview">Overview</a>
+      <a class="cs-nav-link" href="#challenge">Challenge</a>
+      <a class="cs-nav-link" href="#research">Research</a>
+      <a class="cs-nav-link" href="#process">Process</a>
+      <a class="cs-nav-link" href="#solution">Solution</a>
+      <a class="cs-nav-link" href="#outcome">Outcome</a>
+    </nav>
+  </aside>
+
+  <!-- Right: content -->
+  <div class="cs-content">
+
+    <!-- Overview -->
+    <section id="overview" class="cs-section reveal">
+      <div class="cs-section-label">Overview</div>
+      <h2 class="cs-h2">Replacing two days of email threads and Excel files with a workflow that takes under an hour</h2>
+      <p class="cs-body">
+        Maersk's commercial operations teams negotiate thousands of contract amendments each year — rate changes, capacity adjustments, special surcharges. Before this project, the entire lifecycle lived in email chains and manually versioned spreadsheets. There was no audit trail, no single source of truth, and no way to know which version was current.
+      </p>
+      <p class="cs-body">
+        As lead designer on the amendments platform, I worked across operations, legal, engineering, and customer-facing teams to replace the spreadsheet process with a workflow embedded directly in the Maersk platform — end to end, without leaving the product.
+      </p>
+      <div class="tag-row">
+        <span class="tag">Service Design</span>
+        <span class="tag">Workflow Design</span>
+        <span class="tag">B2B / Enterprise</span>
+        <span class="tag">Stakeholder Research</span>
+        <span class="tag">Interaction Design</span>
+      </div>
+    </section>
+
+    <!-- Key metrics -->
+    <div class="stat-row reveal" data-reveal-delay="1">
+      <div class="stat-card">
+        <div class="stat-num">56%</div>
+        <div class="stat-label">reduction in average amendment turnaround time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">4%</div>
+        <div class="stat-label">first-submission error rate, down from 23%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">94%</div>
+        <div class="stat-label">of ops users prefer the new workflow over the old process</div>
+      </div>
+    </div>
+
+    <!-- Challenge -->
+    <section id="challenge" class="cs-section reveal">
+      <div class="cs-section-label">Challenge</div>
+      <h2 class="cs-h2">Two lost days per amendment cycle, 23% error rate, and version confusion at every handoff</h2>
+      <p class="cs-body">
+        The amendment process had never been designed — it had just accreted. An ops specialist would receive an amendment request, copy data into a spreadsheet template, send it by email for approval, wait for a reply, update the version, re-send. On average, a single amendment took <strong>4.8 days</strong> from initiation to system entry.
+      </p>
+      <p class="cs-body">
+        The 23% first-submission error rate wasn't caused by carelessness. It was caused by the process itself: there was no validation layer, no confirmation of intent, and no way to see what had changed between versions. People were making decisions on stale data and didn't know it.
+      </p>
+      <div class="cs-img-block reveal">
+        <img src="uploads/dorien-monnens-53-v5b5qfqc-unsplash.jpg" alt="The old process mapped out" />
+        <div class="cs-img-caption">Service blueprint of the existing process revealed 11 handoff points — each a potential place for information to be lost, delayed, or duplicated.</div>
+      </div>
+    </section>
+
+    <!-- Research -->
+    <section id="research" class="cs-section reveal">
+      <div class="cs-section-label">Research</div>
+      <h2 class="cs-h2">Three weeks of shadowing ops revealed the real bottleneck wasn't speed — it was confidence</h2>
+      <p class="cs-body">
+        I spent three weeks embedded with the operations team, shadowing amendment workflows in real time. I also ran structured interviews with 12 ops specialists and 5 customer-facing account managers.
+      </p>
+      <p class="cs-body">
+        The insight that changed the design direction: people weren't slow because the tools were hard to use. They were slow because they weren't confident in the information in front of them. <strong>Nobody trusted that the version they had was the current one.</strong>
+      </p>
+      <div class="insight-list">
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>
+            <strong>The bottleneck was decision confidence, not data entry speed</strong>
+            Ops specialists were spending 40% of their amendment time on verification calls — checking with colleagues whether the version they had was the right one.
+          </div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>
+            <strong>11 handoff points where information could die</strong>
+            The service blueprint revealed that each amendment passed through an average of 11 handoff points: email to spreadsheet, spreadsheet to approval, approval back to email, email to system entry. Each transition was a potential failure.
+          </div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>
+            <strong>Approval chains had no memory</strong>
+            Approvers couldn't see what had changed from the previous version. Every approval decision was made without a diff — people were approving documents they couldn't fully evaluate.
+          </div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">→</span>
+          <div>
+            <strong>Both sides needed the same view</strong>
+            Account managers and customers were working from different documents. The "current version" existed in two places and was frequently out of sync.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Process -->
+    <section id="process" class="cs-section reveal">
+      <div class="cs-section-label">Process</div>
+      <h2 class="cs-h2">Three concepts, one preference signal, and a hard constraint from legal that changed the design</h2>
+      <p class="cs-body">
+        After mapping the service blueprint, I designed three concepts and ran them through customer testing: (1) an enhanced email integration that kept the existing process but added structure; (2) a lightweight amendment tracker outside the main platform; (3) a fully embedded workflow inside the Maersk product.
+      </p>
+      <p class="cs-body">
+        Testing with 8 ops users showed a clear preference for option 3 — not because it was the fanciest, but because it was the only option where they didn't have to leave the platform they were already in. Context-switching was costing them more than they'd realised.
+      </p>
+      <div class="process-grid">
+        <div class="process-step">
+          <div class="process-num">Step 01</div>
+          <div class="process-title">Service blueprint</div>
+          <div class="process-desc">Mapped the full amendment lifecycle across five teams: ops, legal, account management, customer, and systems. Identified 11 handoffs and 4 points of systematic failure.</div>
+        </div>
+        <div class="process-step">
+          <div class="process-num">Step 02</div>
+          <div class="process-title">Concept testing</div>
+          <div class="process-desc">Built three divergent concepts at varying fidelity. Ran 8 user sessions with ops specialists. Concept 3 (embedded platform workflow) achieved 7/8 preference across all sessions.</div>
+        </div>
+        <div class="process-step">
+          <div class="process-num">Step 03</div>
+          <div class="process-title">Legal constraint sprint</div>
+          <div class="process-desc">Legal flagged a data-retention requirement mid-project: all amendment versions must be stored and auditable for 7 years. This became the version history feature — a constraint that turned into a feature users love.</div>
+        </div>
+        <div class="process-step">
+          <div class="process-num">Step 04</div>
+          <div class="process-title">Pilot with two accounts</div>
+          <div class="process-desc">Ran a 6-week pilot with two enterprise accounts before full rollout. Iterated on the notification model and simplified the approval flow based on pilot feedback before general availability.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Solution -->
+    <section id="solution" class="cs-section reveal">
+      <div class="cs-section-label">Solution</div>
+      <h2 class="cs-h2">One place for every amendment: negotiate, compare, approve, done</h2>
+      <p class="cs-body">
+        The amendments workflow lives entirely within the Maersk platform. Both the ops team and the customer see the same current version, in real time. There is no email attachment, no manually renamed file, and no question about which version is current.
+      </p>
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-dot"></div>
+          <div class="feature-text"><strong>Version history with diff view.</strong> Every change is recorded and attributed. Approvers see exactly what changed between versions — field by field, before they approve.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot"></div>
+          <div class="feature-text"><strong>In-line negotiation comments.</strong> Both parties can comment on specific fields without leaving the amendment. Conversations are attached to the record, not buried in email.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot"></div>
+          <div class="feature-text"><strong>Approval chain with smart notifications.</strong> Each approver is notified when it's their turn — and only their turn. No flooding inboxes, no missed handoffs.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot"></div>
+          <div class="feature-text"><strong>One-click bulk approvals.</strong> For standard amendments with no material changes, approvers can process multiple items at once — a feature that ops leads specifically asked for after the pilot.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot"></div>
+          <div class="feature-text"><strong>Status timeline.</strong> A shared timeline visible to both the ops team and the customer shows where every amendment stands, without anyone needing to ask.</div>
+        </div>
+      </div>
+      <div class="cs-img-block reveal">
+        <img src="uploads/krismas-JGLLU1YNxU4-unsplash.jpg" alt="The amendments platform in use" />
+        <div class="cs-img-caption">The amendments workflow: a single view showing current state, version history, and the approval chain — all in context of the existing contract.</div>
+      </div>
+    </section>
+
+    <!-- Outcome -->
+    <section id="outcome" class="cs-section reveal">
+      <div class="cs-section-label">Outcome</div>
+      <h2 class="cs-h2">Half the turnaround time, a fraction of the errors, and a team that finally trusts the process</h2>
+      <p class="cs-body">
+        The platform launched to all enterprise customers in Q4 2024. Average amendment turnaround dropped from <strong>4.8 days to 2.1 days</strong> — a 56% reduction. The first-submission error rate fell from 23% to 4%, eliminating most of the re-work loops that had been burning ops team time.
+      </p>
+      <p class="cs-body">
+        The version history feature — born from a legal compliance requirement — turned out to be the most appreciated part of the entire release. Ops specialists cited it as the single change that most improved their confidence in the process. Sometimes a constraint is a gift.
+      </p>
+      <p class="cs-body">
+        In the 6 months since launch, no amendment has been lost to an email thread. The ops team has processed 30% more amendments in the same headcount, without any increase in reported stress or overtime.
+      </p>
+      <div class="cs-quote">
+        <p class="cs-quote-text">"Alyona translates fuzzy product strategy into pixels that ship. She'll push back when she should — and she's the first to roll up her sleeves on the hard parts."</p>
+        <div class="cs-quote-author"><strong>Marie Kjær</strong>, VP Product, Maersk</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- ── Bottom navigation ── -->
+<div class="cs-bottom-nav">
+  <a class="cs-bottom-link" href="case-study-fleet-insights.html">
+    <span class="cs-bottom-link-label">Previous case study</span>
+    <span class="cs-bottom-link-title">Fleet Insights 2.0</span>
+    <span class="cs-bottom-link-arrow">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M10 3L6 8l4 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Redesign of Vessel Performance Platform
+    </span>
+  </a>
+  <a class="cs-bottom-link next" href="index.html#works">
+    <span class="cs-bottom-link-label">Back to</span>
+    <span class="cs-bottom-link-title">All work</span>
+    <span class="cs-bottom-link-arrow">
+      View all case studies
+      <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+  </a>
+</div>
+
+<!-- ── Footer ── -->
+<footer class="footer" style="margin-top: 60px;">
+  Made with <span class="heart">💚</span> by Alyona in 2026.
+</footer>
+
+<script>
+  // Nav scroll effect
+  const nav = document.querySelector('.nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 30);
+  }, { passive: true });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => revealObserver.observe(el));
+
+  // Section nav active state on scroll
+  const sections = document.querySelectorAll('.cs-section[id]');
+  const navLinks = document.querySelectorAll('.cs-nav-link');
+
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+        });
+      }
+    });
+  }, { threshold: 0.25, rootMargin: '-80px 0px -45% 0px' });
+
+  sections.forEach(s => sectionObserver.observe(s));
+</script>
+
+</body>
+</html>
